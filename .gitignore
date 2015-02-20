@@ -1,0 +1,9 @@
+/icons
+/Ins
+BOBS
+.env.*.php
+.env.php
+.DS_Store
+Thumbs.db
+.*.swp
+.vim*
