@@ -1,6 +1,6 @@
 /icons
 /Ins
-/v2
+/v2/*.h
 BOBS
 .env.*.php
 .env.php
