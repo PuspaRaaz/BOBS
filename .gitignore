@@ -1,6 +1,12 @@
 /icons
 /Ins
-/v2/*.h
+/v2/basic.h
+/v2/editMenu.h
+/v2/executeMenu.h
+/v2/fileMenu.h
+/v2/helpMenu.h
+/v2/memory.h
+/v2/registers.h
 BOBS
 .env.*.php
 .env.php
