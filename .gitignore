@@ -1,4 +1,4 @@
-/icons
+/v1
 /Ins
 /v2/basic.h
 /v2/editMenu.h
@@ -7,6 +7,8 @@
 /v2/helpMenu.h
 /v2/memory.h
 /v2/registers.h
+/v2/a.out
+a.out
 BOBS
 .env.*.php
 .env.php

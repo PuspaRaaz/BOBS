@@ -57,18 +57,15 @@ int main(int argc, char ** argv){
 	GtkWidget* registers = drawRegisters(window); //gets registers and their dependencies widget
 	gtk_box_pack_start(GTK_BOX(container), registers, 0,0,0); //add register row to container
 
-	GtkWidget* textarea = gtk_text_view_new();
-	// gtk_box_pack_start(GTK_BOX(registers), textarea, 1,1,1); //add text-box to container
-
+	GtkWidget* editableBox = gtk_vbox_new(0,0);
 	GtkWidget* textArea = gtk_text_view_new();
-    GtkWidget* textEntry = gtk_entry_new();
-    GtkObject* halign = gtk_adjustment_new(0,0,20,1,5,1);
-    GtkObject* valign = gtk_adjustment_new(0,0,50,1,5,1);
-    // GtkWidget* scrolledwindow = gtk_scrolled_window_new(GTK_ADJUSTMENT(halign),GTK_ADJUSTMENT(valign));
     GtkWidget* scrolledwindow = gtk_scrolled_window_new(NULL,NULL);
     gtk_widget_set_size_request(scrolledwindow, 250,300);
 
-    GtkWidget* clipboardBox = gtk_vbox_new(0,0);
+    gtk_container_add(GTK_CONTAINER(scrolledwindow), textArea);
+	gtk_box_pack_start(GTK_BOX(editableBox), scrolledwindow, 1, 1, 3);
+
+    GtkWidget* clipboardBox = gtk_hbox_new(0,0);
     GtkWidget* button = gtk_button_new_with_label("Cut");
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(cutTextToClipboard), (gpointer) textArea);
     gtk_box_pack_start(GTK_BOX(clipboardBox), button, 0,0,0);
@@ -77,14 +74,20 @@ int main(int argc, char ** argv){
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(copyTextToClipboard), (gpointer) textArea);
     gtk_box_pack_start(GTK_BOX(clipboardBox), button, 0,0,0);
 
+	textArea = gtk_text_view_new();
+    scrolledwindow = gtk_scrolled_window_new(NULL,NULL);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(textArea), FALSE);
+    gtk_widget_set_size_request(scrolledwindow, 250,300);
+
     button = gtk_button_new_with_label("Paste");
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(pasteTextFromClipboard), (gpointer) textArea);
     gtk_box_pack_start(GTK_BOX(clipboardBox), button, 0,0,0);
 
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), textArea);
+    gtk_box_pack_start(GTK_BOX(editableBox), clipboardBox, 0,0,0);
+    gtk_box_pack_start(GTK_BOX(registers), editableBox, 0, 0, 0);
 
-	gtk_box_pack_start(GTK_BOX(registers), scrolledwindow, 1, 1, 0);
-    gtk_box_pack_start(GTK_BOX(registers), clipboardBox, 0,0,0);
+    gtk_container_add(GTK_CONTAINER(scrolledwindow), textArea);
+	gtk_box_pack_start(GTK_BOX(registers), scrolledwindow, 1, 1, 3);
 
 	GtkWidget* memory = drawMemory(window); //gets memory and their dependencies widget
 	gtk_box_pack_start(GTK_BOX(registers), memory, 0,1,0); //keep memory block horizontal to register block
