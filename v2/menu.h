@@ -84,29 +84,28 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 	//Execute menu
 	menuItems = gtk_menu_item_new_with_label("Build");
 	gtk_menu_shell_append(GTK_MENU_SHELL(executeMenu), menuItems);
-	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F5, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F5, GdkModifierType(NULL), GTK_ACCEL_VISIBLE);
 	g_signal_connect(menuItems, "activate", G_CALLBACK(buildMenu), NULL);
 
 	menuItems = gtk_menu_item_new_with_label("Run");
 	gtk_menu_shell_append(GTK_MENU_SHELL(executeMenu), menuItems);
-	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F9, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F9, GdkModifierType(NULL), GTK_ACCEL_VISIBLE);
 	g_signal_connect(menuItems, "activate", G_CALLBACK(runMenu), NULL);
 
 	menuItems = gtk_menu_item_new_with_label("Single Step");
 	gtk_menu_shell_append(GTK_MENU_SHELL(executeMenu), menuItems);
-	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F10, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F10, GdkModifierType(NULL), GTK_ACCEL_VISIBLE);
 	g_signal_connect(menuItems, "activate", G_CALLBACK(singleStepMenu), NULL);
 
-	//tools menu
 	//Help menu
 	menuItems = gtk_menu_item_new_with_label("Instructions");
 	gtk_menu_shell_append(GTK_MENU_SHELL(helpMenu), menuItems);
-	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F3, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F3, GdkModifierType(NULL), GTK_ACCEL_VISIBLE);
 	g_signal_connect(menuItems, "activate", G_CALLBACK(instructionDialog), NULL);
 
 	menuItems = gtk_menu_item_new_with_label("Help");
 	gtk_menu_shell_append(GTK_MENU_SHELL(helpMenu), menuItems);
-	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F1, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menuItems, "activate", accelGroup, GDK_F1, GdkModifierType(NULL), GTK_ACCEL_VISIBLE);
 	g_signal_connect(menuItems, "activate", G_CALLBACK(helpDialog), NULL);
 
 	sep = gtk_separator_menu_item_new();
