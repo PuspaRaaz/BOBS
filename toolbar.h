@@ -1,11 +1,7 @@
 #ifndef _TOOLBAR_H_
 #define _TOOLBAR_H_
 
-// #include "editMenu.h"
-// #include "executeMenu.h"
-// #include "fileMenu.h"
-// #include "helpMenu.h"
-#include "menuResponse.h"
+#include "menu.h"
 
 GtkWidget* drawToolbar(GtkWidget* window){
 	GtkWidget* toolbar = gtk_toolbar_new();
@@ -35,7 +31,7 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	icon = gtk_image_new_from_icon_name("gtk-goto-last", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "SS", "Single Step (F10)", "Private", icon, G_CALLBACK(singleStepMenu), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-convert", GTK_ICON_SIZE_BUTTON);
-	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Convert", "Convert Code (F10)", "Private", icon, G_CALLBACK(convertMenu), NULL);
+	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Convert", "Convert Code (F11)", "Private", icon, G_CALLBACK(convertMenu), NULL);
 	
 	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 
