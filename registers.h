@@ -6,9 +6,9 @@ GtkWidget* drawRegisters(GtkWidget* window){
 	GtkWidget* container = gtk_vbox_new(0,0);
 
 	const gchar* regNames[] = {"B:", "C:", "D:", "E:", "H:", "L:", "M:", "A:", "F:", "PC:"};
-	const gchar* regValues[] = {"95", "b8", "d2", "e1", "f5", "a0", "46", "39", "12", "8000"};
-
 	const gchar* portNames[] = {"Flag:", "Port A:", "Port B:", "Port C:"};
+
+	const gchar* regValues[] = {"95", "b8", "d2", "e1", "f5", "a0", "46", "39", "12", "8000"};
 	const gchar* portValues[] = {"1 0 1 0 1", "0 1 0 0 0 1 0 0", "1 0 0 1 1 0 1 0", "0 0 0 1 0 1 1 0"};
 
 	GtkWidget *align, *label;
