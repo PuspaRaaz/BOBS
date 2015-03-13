@@ -1,6 +1,9 @@
 #ifndef _MENUACTIONS_H_
 #define _MENUACTIONS_H_
 
+#include "basic.h"
+#include <gtk/gtk.h>
+
 static void newFile(GtkWidget* button, gpointer window){
     g_print("New...\n");
 }
@@ -77,7 +80,10 @@ static void singleStepMenu(GtkWidget* button, gpointer window){
 }
 
 static void convertMenu(GtkWidget* button, gpointer window){
-    g_print("Converted...\n");
+    GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+    GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
+
+    gtk_text_buffer_paste_clipboard(buffer, clipboard, NULL, TRUE);
 }
 
 //help menu

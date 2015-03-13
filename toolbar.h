@@ -2,13 +2,14 @@
 #define _TOOLBAR_H_
 
 #include "menu.h"
+#include "basic.h"
 
 GtkWidget* drawToolbar(GtkWidget* window){
-	GtkWidget* toolbar = gtk_toolbar_new();
+	toolbar = gtk_toolbar_new();
 	gtk_container_set_border_width(GTK_CONTAINER(toolbar), 5);
     gtk_toolbar_set_style(GTK_TOOLBAR ( toolbar ), GTK_TOOLBAR_ICONS);
 
-	GtkWidget* icon = gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "New", "New (Ctrl+N)", "Private", icon, G_CALLBACK(newFile), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-open", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Open", "Open (Ctrl+O)", "Private", icon, G_CALLBACK(openFile), NULL);
@@ -52,7 +53,7 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	icon = gtk_image_new_from_icon_name("gtk-close", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Quit", "Quit (Ctrl+Q)", "Private", icon, G_CALLBACK(gtk_main_quit), NULL);
 	
-	GtkWidget* hbox = gtk_hbox_new(0,0);
+	hbox = gtk_hbox_new(0,0);
 	gtk_box_pack_start(GTK_BOX(hbox), toolbar, 0,0,0);
 
 	return hbox;

@@ -9,9 +9,6 @@
 int main(int argc, char ** argv){
 	gtk_init(&argc, &argv); //initialize gtkMain
 
-	GtkWidget *window, *container; //define basic variables
-	GtkWidget* ppiFrame = gtk_frame_new(" 8255 PPI\t"); //initialize ppi frame
-
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL); //construct window on toplevel
 	gtk_window_set_title(GTK_WINDOW(window), "BOBS' Simulator - a 8085 microprocessor simulator"); //set window title
 	gtk_window_set_default_size(GTK_WINDOW(window), 600, 480); //set window default size

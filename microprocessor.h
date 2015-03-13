@@ -1,11 +1,13 @@
 #ifndef _MICROPROCESSOR_H_
 #define _MICROPROCESSOR_H_
 
+#include "basic.h"
+
 GtkWidget* getMicroprocessor(GtkWidget* window){
 	int i, j;
-	GtkWidget* micro = gtk_hbox_new(0,0);
-	GtkWidget* hbox = gtk_hbox_new(0,0);
-	GtkWidget* vbox = gtk_vbox_new(0,0);
+	micro = gtk_hbox_new(0,0);
+	hbox = gtk_hbox_new(0,0);
+	vbox = gtk_vbox_new(0,0);
 
 	const gchar* regNames[] = {"B:", "C:", "D:", "E:", "H:", "L:", "M:", "A:", "F:", "PC:"};
 	const gchar* portNames[] = {"Flag:", "Port A:", "Port B:", "Port C:"};
@@ -78,11 +80,11 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_container_add(GTK_CONTAINER(frame), vbox);
 	gtk_box_pack_start(GTK_BOX(micro), frame, 0, 0, 1);
 
-	GtkWidget* textArea = gtk_text_view_new();
 	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
     gtk_widget_set_size_request(scrolledWindow, 250,300);
 
-    gtk_container_add(GTK_CONTAINER(scrolledWindow), textArea);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaYourCode), 5);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaYourCode);
     gtk_box_pack_start(GTK_BOX(vbox), scrolledWindow, 1, 1, 3);
 
 	vbox = gtk_vbox_new(0,0);
@@ -91,12 +93,13 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_container_add(GTK_CONTAINER(frame), vbox);
 	gtk_box_pack_start(GTK_BOX(micro), frame, 0, 0, 1);
 
-	textArea = gtk_text_view_new();
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(textArea), FALSE);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaConvertedCode), 5);
 	scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
     gtk_widget_set_size_request(scrolledWindow, 250,300);
 
-    gtk_container_add(GTK_CONTAINER(scrolledWindow), textArea);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaConvertedCode);
     gtk_box_pack_start(GTK_BOX(vbox), scrolledWindow, 1, 1, 3);
 
 	//textarea finished

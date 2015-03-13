@@ -2,6 +2,7 @@
 #define _MENU_H_
 
 #include "menuActions.h"
+#include "basic.h"
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include <string.h>
@@ -82,11 +83,10 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 	const gchar* helpMenuItemNames[] = {"Instructions", "Help", "About"};
 	const guint helpMenuAccelGroup[] = {GDK_F3, GDK_F1, GDK_F12};
 
-	GtkWidget* menuBox = gtk_vbox_new(0, 0);
-	GtkWidget* menuBar = gtk_menu_bar_new();
-	GtkWidget* sep = gtk_separator_menu_item_new();
-	GtkAccelGroup* accelGroup = gtk_accel_group_new();
-	GtkWidget* items;
+	vbox = gtk_vbox_new(0, 0);
+	menuBar = gtk_menu_bar_new();
+	sep = gtk_separator_menu_item_new();
+	accelGroup = gtk_accel_group_new();
 
 	gtk_window_add_accel_group(GTK_WINDOW(window), accelGroup);
 
@@ -133,8 +133,8 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		g_signal_connect(items, "activate", G_CALLBACK(menuResponse), (gpointer) window);
 	}
 
-	gtk_box_pack_start(GTK_BOX(menuBox), menuBar, 0,0,0);
-	return menuBox;
+	gtk_box_pack_start(GTK_BOX(vbox), menuBar, 0,0,0);
+	return vbox;
 }
 
 #endif
