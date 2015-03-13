@@ -76,8 +76,8 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 	const gchar* editMenuItemNames[] = {"Undo", "Redo", "Preferences"};
 	const guint editMenuAccelGroup[] = {GDK_z, GDK_y, GDK_p};
 
-	const gchar* executeMenuItemNames[] = {"Build", "Run", "Single Step", "Convert"};
-	const guint executeMenuAccelGroup[] = {GDK_F5, GDK_F9, GDK_F10, GDK_F11};
+	const gchar* executeMenuItemNames[] = {"Build", "Run", "Single Step"};
+	const guint executeMenuAccelGroup[] = {GDK_F5, GDK_F9, GDK_F10};
 
 	const gchar* helpMenuItemNames[] = {"Instructions", "Help", "About"};
 	const guint helpMenuAccelGroup[] = {GDK_F3, GDK_F1, GDK_F12};
