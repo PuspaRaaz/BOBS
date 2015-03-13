@@ -40,7 +40,6 @@ Memory Op[MAX_OP_LEN];
 //define functions used
 int to_opcode();
 int is_instruction();
-void micro_main();
 void Init_labels();
 void Increase_O_pos(char*);
 void get_token();
@@ -48,6 +47,8 @@ void To_Start();
 void Append(int );
 int Op_val(char );
 int Find_label(char*);
-void print(Memory* , int);
+
+void micro_main(char*, FILE*);
+void print(Memory* , int,FILE* );
 
 #endif

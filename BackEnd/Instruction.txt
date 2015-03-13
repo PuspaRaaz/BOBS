@@ -1,0 +1,9 @@
+mvi a,24
+mov b,a
+lda 8000
+hello: out 40
+mov a,b
+dcr a
+jnz hello
+ret
+

@@ -33,7 +33,7 @@ void get_token(){
         }
 
         *temp = '\0';
-        if (strlen(token) == 1 && strchr("ABCDEHLM",*token))
+        if (strlen(token) == 1 && strchr("ABCDEHLMabcdehlm",*token))
             token_t = REGMEM;
     }
 
@@ -68,6 +68,7 @@ void Increase_O_pos(char* instruction){
 }
 
 int Op_val(char in){
+    in = toupper(in);
     switch (in){
         case 'A': return 0x7; break;
         case 'B': return 0x0; break;
@@ -634,7 +635,7 @@ int to_opcode(){
         }
 
         else if (!strcasecmp("LDA",token)){
-            Append(0x3a);
+            Append(0x3A);
             get_token();
             if (token_t != NUMBER){
                 ThrowError("not a memory location",Op_count);
@@ -642,8 +643,8 @@ int to_opcode(){
             }
             else{
                 temp = (int) strtol(token,NULL,16);
-                Append(temp & 0x00FF);
-                Append(temp & 0xFF00);
+                Append(temp & 0xFF);
+                Append((temp & 0xFF00)>>8);
             }
 
         }
@@ -663,7 +664,7 @@ int to_opcode(){
         }
 
         else if (!strcasecmp("LHLD",token)){
-            Append(0x2a);
+            Append(0x2A);
             get_token();
             if (token_t != NUMBER){
                 ThrowError("not a memory location",Op_count);
@@ -1148,7 +1149,7 @@ void To_Start(){
     token_t = -1;
 }
 
-void micro_main(char* instructions){
+void micro_main(char* instructions, FILE* outfile){
     start = instructions;
     input = instructions;
     Op_count = 0;
@@ -1163,14 +1164,14 @@ void micro_main(char* instructions){
     //convert the code to opcode
     to_opcode();
 
-    print(&Op,Op_count);
+    print(&Op,Op_count,outfile);
 }
 
-void print(Memory* in , int c)
+void print(Memory* in , int c,FILE* outfile)
 {
     int i;
     for( i =0;i<c;i++){
-        printf("%X : ",in[i].addr);
-        printf("%X \n",in[i].value);
+        fprintf(outfile,"%X : ",in[i].addr);
+        fprintf(outfile,"%X \n",in[i].value);
     }
 }

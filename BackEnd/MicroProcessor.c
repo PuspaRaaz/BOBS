@@ -1,9 +1,32 @@
 #include "MicroProcessor.h"
 
-int main()
-{
+int main(){
     start_of_code = 0x8000;
-    micro_main("Start1: Mov A,B \n Hello: ACI 24 \n MOV A,B\n HLT \n CALL Hello \n Hello2: MVI A,3");
+    const size_t total_size = 300;
+    const size_t line_size = 30;
+
+    char* tline = malloc(total_size);
+    char* cline = malloc(line_size);
+
+    FILE* ifile = fopen("Instruction.txt","r");
+    FILE* ofile = fopen("Opcode.txt","w");
+
+    if (!(ifile)){
+        printf("File could not be located");
+        return -1;
+    }
+
+    while (fgets(cline, line_size, ifile) != NULL){
+        strcat(tline,cline);
+        strcat(tline," ");
+    }
+
+    micro_main(tline,ofile);
+    free(tline);
+    free(cline);
+
+    fclose(ifile);
+    fclose(ofile);
     return 0;
 }
 
