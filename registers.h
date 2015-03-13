@@ -16,7 +16,7 @@ GtkWidget* drawRegisters(GtkWidget* window){
 
 	int i, j;
 	GtkWidget* table = gtk_table_new(5,4,1);
-	frame = gtk_frame_new(" Registers\t");
+	frame = gtk_frame_new("Registers");
 	for (i = 0; i < 5; i++){
 		for (j = 0; j < 2; j++){
 			label = gtk_label_new(regNames[2*i+j]);
@@ -35,7 +35,7 @@ GtkWidget* drawRegisters(GtkWidget* window){
 	gtk_box_pack_start(GTK_BOX(container), frame, 0, 0, 5);
 
 	table = gtk_table_new(4, 2, 1);
-	frame = gtk_frame_new(" Outputs\t");
+	frame = gtk_frame_new("Outputs");
 	for (i = 0; i < 4; i++){
 		label = gtk_label_new(portNames[i]);
 		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
