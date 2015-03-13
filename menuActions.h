@@ -76,6 +76,10 @@ static void singleStepMenu(GtkWidget* button, gpointer window){
     g_print("Single Step...\n");
 }
 
+static void convertMenu(GtkWidget* button, gpointer window){
+    g_print("Converted...\n");
+}
+
 //help menu
 static void instructionDialog(GtkWidget* button, gpointer window){
     GtkWidget* dialog, *label, *image, *vbox;

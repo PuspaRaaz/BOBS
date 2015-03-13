@@ -7,17 +7,17 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	GtkWidget* hbox = gtk_hbox_new(0,0);
 	GtkWidget* vbox = gtk_vbox_new(0,0);
 
-	const gchar* regNames[] = {"B:", "C:", "D:", "E:", "H:", "L:", "M:", "A:", "F:", "PC:", "IR", "SP"};
+	const gchar* regNames[] = {"B:", "C:", "D:", "E:", "H:", "L:", "M:", "A:", "F:", "PC:"};
 	const gchar* portNames[] = {"Flag:", "Port A:", "Port B:", "Port C:"};
 
-	const gchar* regValues[] = {"95", "b8", "d2", "e1", "f5", "a0", "46", "39", "12", "8000", "OE", "FFFF"};
+	const gchar* regValues[] = {"95", "b8", "d2", "e1", "f5", "a0", "46", "39", "12", "8000"};
 	const gchar* portValues[] = {"1 0 1 0 1", "0 1 0 0 0 1 0 0", "1 0 0 1 1 0 1 0", "0 0 0 1 0 1 1 0"};
 
 	GtkWidget *align, *label, *entry, *frame;
 
 	GtkWidget* table = gtk_table_new(5,4,1);
 	frame = gtk_frame_new(" Registers\t");
-	for (i = 0; i < 6; i++){
+	for (i = 0; i < 5; i++){
 		for (j = 0; j < 2; j++){
 			label = gtk_label_new(regNames[2*i+j]);
 			align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
