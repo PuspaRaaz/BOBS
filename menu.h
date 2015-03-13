@@ -90,6 +90,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 
 	gtk_window_add_accel_group(GTK_WINDOW(window), accelGroup);
 
+//menu items
 	int length = sizeof(menuName) / sizeof(*menuName);
 	for(i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_mnemonic(menuName[i]);
@@ -97,7 +98,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), items);
 	}
 
-	//file menu items
+//file menu items
 	length = sizeof(fileMenuItemNames) / sizeof(*fileMenuItemNames);
 	for (i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_label(fileMenuItemNames[i]);
@@ -106,7 +107,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		g_signal_connect(items, "activate", G_CALLBACK(menuResponse), (gpointer) window);
 	}
 
-	//edit menu items
+//edit menu items
 	length = sizeof(editMenuItemNames) / sizeof(*editMenuItemNames);
 	for (i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_label(editMenuItemNames[i]);
@@ -115,7 +116,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		g_signal_connect(items, "activate", G_CALLBACK(menuResponse), (gpointer) window);
 	}
 
-	//execute menu items
+//execute menu items
 	length = sizeof(executeMenuItemNames) / sizeof(*executeMenuItemNames);
 	for (i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_label(executeMenuItemNames[i]);
@@ -124,7 +125,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		g_signal_connect(items, "activate", G_CALLBACK(menuResponse), (gpointer) window);
 	}
 
-	//help menu items
+//help menu items
 	length = sizeof(helpMenuItemNames) / sizeof(*helpMenuItemNames);
 	for (i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_label(helpMenuItemNames[i]);

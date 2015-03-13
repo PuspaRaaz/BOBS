@@ -10,7 +10,6 @@ int main(int argc, char ** argv){
 	gtk_init(&argc, &argv); //initialize gtkMain
 
 	GtkWidget *window, *container; //define basic variables
-	GtkWidget* ppiFrame = gtk_frame_new(" 8255 PPI\t"); //initialize ppi frame
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL); //construct window on toplevel
 	gtk_window_set_title(GTK_WINDOW(window), "BOBS' Simulator - a 8085 microprocessor simulator"); //set window title
@@ -20,7 +19,7 @@ int main(int argc, char ** argv){
 	gtk_window_set_icon(GTK_WINDOW(window), createPixbuf("BOBS'.jpg")); //program icon
 	g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL); //provision to quit with 'Alt+f4' or 'X' from title bar
 
-	container = drawMenuItems(window); //container gets menus located at title bar
+	container = drawMenuItems(window); //container gets menus located at title bar. As GtkWidget* is returned, container is not as any widget
 
 	gtk_box_pack_start(GTK_BOX(container), drawToolbar(window), 0, 1, 0); //toolbar is added to container
 
