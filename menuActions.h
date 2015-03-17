@@ -2,7 +2,11 @@
 #define _MENUACTIONS_H_
 
 #include "basic.h"
+#include <ctype.h>
 #include <gtk/gtk.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static void newFile(GtkWidget* button, gpointer window){
     g_print("New...\n");
@@ -12,7 +16,6 @@ static void openFile(GtkWidget* button, gpointer window){
     GtkWidget *dialog;
     dialog = gtk_file_chooser_dialog_new("Choose a file", GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
     gtk_widget_show_all(dialog);
-    // gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), g_get_home_dir());
     gint resp = gtk_dialog_run(GTK_DIALOG(dialog));
     if(resp == GTK_RESPONSE_OK)
         g_print("%s\n", gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
@@ -80,9 +83,34 @@ static void singleStepMenu(GtkWidget* button, gpointer window){
 }
 
 static void convertMenu(GtkWidget* button, gpointer window){
+    const size_t total_size = 300;
+    const size_t line_size = 30;
+
+    char* tline = (char*) malloc(total_size);
+    char* cline = (char*) malloc(line_size);
+
+    FILE* ifile = fopen("Files/Instruction.bob","r");
+    FILE* ofile = fopen("Files/Opcode.bob","w");
+
+    if (!(ifile)){
+        printf("File could not be located\n");
+        return;
+    }
+
+    while (fgets(cline, line_size, ifile) != NULL){
+        strcat(tline,cline);
+        strcat(tline," ");
+    }
+
+    // micro_main(tline,ofile);
+    free(tline);
+    free(cline);
+
+    fclose(ifile);
+    fclose(ofile);
     GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
     GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
-
+    gtk_text_buffer_set_text(buffer, "", 0);
     gtk_text_buffer_paste_clipboard(buffer, clipboard, NULL, TRUE);
 }
 
