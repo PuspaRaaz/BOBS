@@ -137,7 +137,108 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	micro = gtk_hbox_new(0, 0);
 	hbox = gtk_hbox_new(0, 0);
 	vbox = gtk_vbox_new(0, 0);
-	entry = gtk_entry_new();
 	textAreaYourCode = gtk_text_view_new();
 	textAreaConvertedCode = gtk_text_view_new();
+
+//registers
+	table = gtk_table_new(8, 3, 1);
+	for (i = 0; i < 8; i++){
+		label = gtk_label_new("A");
+		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
+		gtk_container_add(GTK_CONTAINER(align), label);
+		gtk_table_attach(GTK_TABLE(table), align, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+
+		for (j = 0; j < 2; j++){
+			if ((i == 0) || (i == 7)){
+				label = gtk_label_new("88");
+				gtk_table_attach(GTK_TABLE(table), label, 1, 3, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+				j++;
+			}else{
+				label = gtk_label_new("88");
+				gtk_table_attach(GTK_TABLE(table), label, j+1, j+2, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+			}
+		}
+	}
+	frame = gtk_frame_new(" Registers\t");
+	gtk_container_add(GTK_CONTAINER(frame), table);
+	gtk_box_pack_start(GTK_BOX(hbox), frame, 0, 0, 5);
+
+//flags
+	table = gtk_table_new(5, 2, 1);
+	for (i = 0; i < 5; i++){
+		label = gtk_label_new("A");
+		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
+		gtk_container_add(GTK_CONTAINER(align), label);
+		gtk_table_attach(GTK_TABLE(table), align, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+
+		label = gtk_label_new("88");
+		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
+		gtk_container_add(GTK_CONTAINER(align), label);
+		gtk_table_attach(GTK_TABLE(table), align, 1, 2, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+	}
+	frame = gtk_frame_new(" Flags\t");
+	gtk_container_add(GTK_CONTAINER(frame), table);
+	gtk_box_pack_start(GTK_BOX(hbox), frame, 0, 0, 5);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, 0, 0, 5);
+
+//output ports
+	table = gtk_table_new(3, 5, 1);
+	for (i = 0; i < 3; i++){
+		label = gtk_label_new("Port A");
+		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
+		gtk_container_add(GTK_CONTAINER(align), label);
+		gtk_table_attach(GTK_TABLE(table), align, 0, 2, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+
+		entry = gtk_entry_new();
+		gtk_entry_set_max_length(GTK_ENTRY(entry), 8);
+		gtk_widget_set_size_request(entry, 50, 25);
+		gtk_table_attach(GTK_TABLE(table), entry, 2, 5, i, i+1, GTK_FILL, GTK_FILL, 2, 2);
+	}
+	frame = gtk_frame_new(" O/P Ports\t");
+	gtk_container_add(GTK_CONTAINER(frame), table);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
+
+//memory access
+	table = gtk_table_new(1, 3, 0);
+	entry = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
+	gtk_widget_set_size_request(entry, 55, 25);
+	gtk_table_attach(GTK_TABLE(table), entry, 0, 1, 0, 1, GTK_FILL, GTK_FILL, 2, 2);
+	entry = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(entry), 2);
+	gtk_widget_set_size_request(entry, 38, 25);
+	gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 0, 1, GTK_FILL, GTK_FILL, 2, 2);
+	GtkWidget* button = gtk_button_new_with_label("GO");
+	gtk_table_attach(GTK_TABLE(table), button, 2, 3, 0, 1, GTK_FILL, GTK_FILL, 2, 2);
+
+	frame = gtk_frame_new(" Memory\t");
+	gtk_container_add(GTK_CONTAINER(frame), table);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
+	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
+	
+	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
+
+//codearea
+	vbox = gtk_vbox_new(0, 0);
+	hbox = gtk_hbox_new(0, 0);
+	GtkWidget* notebook = gtk_notebook_new();
+	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
+	gtk_box_pack_start(GTK_BOX(micro), notebook, 0, 0, 5);
+
+	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
+    gtk_widget_set_size_request(scrolledWindow, 250,300);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaYourCode), 5);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaYourCode);
+	label = gtk_label_new ("YourCode");
+	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
+	scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
+    gtk_widget_set_size_request(scrolledWindow, 250,300);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaConvertedCode), 5);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaConvertedCode);
+	label = gtk_label_new ("ConvertedCode");
+	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
+
+	return micro;
 }
