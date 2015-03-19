@@ -1,0 +1,6 @@
+mvi a, 80
+out 43
+lxi h, ff40
+lxi d, 04ff
+xchg
+ret

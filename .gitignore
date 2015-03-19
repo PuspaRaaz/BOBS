@@ -1,11 +1,5 @@
-/Ins
-/BackEnd/bin
-/BackEnd/obj
-/v1
-/Files
-BOBS'.jpg
-a.out
-BOBS
+/bin
+/obj
 Thumbs.db
 *.cbp
 *.depend
