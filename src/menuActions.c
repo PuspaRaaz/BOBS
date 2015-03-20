@@ -38,6 +38,7 @@ void preferencesMenu(GtkWidget* button, gpointer window){
 
 //execute menu
 void buildMenu(GtkWidget* button, gpointer window){
+    clear();
     microMain();
 }
 

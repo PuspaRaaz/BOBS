@@ -1088,7 +1088,7 @@ int to_opcode(){
         }
 
         else{
-           // ThrowError("I do not recognize the shit! you've written", Op_count);
+           ThrowError("I do not recognize the shit! you've written", Op_count);
         }
 
     }

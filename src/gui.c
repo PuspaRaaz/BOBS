@@ -9,6 +9,11 @@ char* getCodedText(){
 	return text;
 }
 
+void clear(){
+	GtkTextBuffer* textBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(errorArea));
+	gtk_text_buffer_set_text(textBuffer, "", 0);
+}
+
 void notebookNextPage(){
     gtk_notebook_next_page (GTK_NOTEBOOK(notebook));
 }
@@ -19,11 +24,18 @@ void displayConverted(char* convertedCode){
 }
 
 void displayErrorMessage(char* message, int pos){
-	char position[20];
-	sprintf(position, "%X :\t", pos);
-	strcat(position, message);
+	gchar *mainMessage; char position[8], *errorMsg;
+    GtkTextIter start, end;
 	GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(errorArea));
-    gtk_text_buffer_set_text(buffer, position, strlen(position));
+	gtk_text_buffer_get_bounds (buffer, &start, &end);
+	mainMessage = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+	sprintf(position, "%X :\t", pos);
+	errorMsg = mainMessage;
+	strcat(errorMsg, position);
+	strcat(errorMsg, message);
+	message = "\n";
+	strcat(errorMsg, message);
+    gtk_text_buffer_set_text(buffer, errorMsg, strlen(errorMsg));
 }
     
 

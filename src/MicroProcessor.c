@@ -1,6 +1,6 @@
 #include "MicroProcessor.h"
 
-int main(){
+int microMain(){
     start_of_code = 0x8000;
     const size_t total_size = 300;
     const size_t line_size = 30;
@@ -33,8 +33,7 @@ int main(){
 
 //Throw error
 void ThrowError(char* message, int pos){
-   printf("%s at pos %X ",message,start_of_code+pos);
-   return;
+   displayErrorMessage(message, start_of_code+pos);
 }
 
 void initialize(){
