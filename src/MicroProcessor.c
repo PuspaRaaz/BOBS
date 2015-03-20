@@ -7,7 +7,9 @@ int microMain(){
 
     char* tline = malloc(total_size);
     char* cline = malloc(line_size);
-
+    
+    strcpy(tline, " ");
+ 
     FILE* ifile = fopen("bin/Instruction.txt","r");
     FILE* ofile = fopen("bin/Opcode.txt","w");
 
@@ -20,7 +22,6 @@ int microMain(){
         strcat(tline,cline);
         strcat(tline," ");
     }
-    // printf("%s\n", tline);
     micro_main(tline,ofile);
     free(tline);
     free(cline);
