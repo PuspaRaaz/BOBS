@@ -20,6 +20,8 @@ int main(int argc, char** argv){
 	gtk_box_pack_start(GTK_BOX(container), drawToolbar(window), 0, 1, 0); //toolbar is added to container
 	gtk_box_pack_start(GTK_BOX(container), gtk_hseparator_new(), 0, 0, 0); //horizontal separator is added
 	gtk_box_pack_start(GTK_BOX(container), getMicroprocessor(window), 0, 0, 5); //microprocessor components are added
+	gtk_box_pack_start(GTK_BOX(container), gtk_hseparator_new(), 0, 0, 0); //horizontal separator is added
+	gtk_box_pack_start(GTK_BOX(container), getError(window), 1, 1, 5); //microprocessor components are added
 
 	gtk_container_add(GTK_CONTAINER(window), container);
 	gtk_widget_show_all(window);

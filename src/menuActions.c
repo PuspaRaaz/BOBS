@@ -71,6 +71,7 @@ void convertMenu(GtkWidget* button, gpointer window){
         strcat(tline," ");
     }
     displayConverted(tline);
+    notebookNextPage();
     free(tline);
     free(cline);
 

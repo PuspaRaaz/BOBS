@@ -33,8 +33,7 @@ int microMain(){
 
 //Throw error
 void ThrowError(char* message, int pos){
-   printf("%s at pos %d ",message,pos);
-   exit(0);
+    displayErrorMessage(message, pos);
 }
 
 void initialize(){
