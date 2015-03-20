@@ -1087,8 +1087,12 @@ int to_opcode(){
             Append(0xE3);
         }
 
+        else if (!strcasecmp(" ",token)){
+            
+        }
+
         else{
-           ThrowError("I do not recognize the shit! you've written", Op_count);
+           // ThrowError("I do not recognize the shit! you've written", Op_count);
         }
 
     }

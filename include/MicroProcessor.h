@@ -13,7 +13,7 @@ void ThrowError(char*,int);
 int my_itoa(int val, char* buf);
 
 char flag;
-char A,B,C,D,E,H,L,M,SP;
+char A,B,C,D,E,H,L,M,SP,PC,PSW,IR;
 
 typedef struct{
     int addr;

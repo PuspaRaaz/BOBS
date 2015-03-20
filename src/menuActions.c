@@ -38,7 +38,7 @@ void preferencesMenu(GtkWidget* button, gpointer window){
 
 //execute menu
 void buildMenu(GtkWidget* button, gpointer window){
-    clear();
+    // clear();
     microMain();
 }
 
@@ -55,27 +55,35 @@ void convertMenu(GtkWidget* button, gpointer window){
     const size_t total_size = 300;
     const size_t line_size = 30;
 
-    char* tline = malloc(total_size);
+    char* mnemonics = malloc(total_size);
+    char* opcode = malloc(total_size);
     char* cline = malloc(line_size);
     
-    strcpy(tline, " ");
+    strcpy(mnemonics, " ");
+    strcpy(opcode, " ");
  
+    FILE* mfile = fopen("bin/Instruction.txt","r");
     FILE* ofile = fopen("bin/Opcode.txt","r");
 
-    if (!(ofile)){
+    if (!(ofile) || (!mfile)){
         printf("File could not be located");
         return;
     }
 
-    while (fgets(cline, line_size, ofile) != NULL){
-        strcat(tline,cline);
-        strcat(tline," ");
+    while (fgets(cline, line_size, mfile) != NULL){
+        strcat(mnemonics,cline);
+        strcat(mnemonics," ");
     }
-    displayConverted(tline);
-    notebookNextPage();
-    free(tline);
+    while (fgets(cline, line_size, ofile) != NULL){
+        strcat(opcode,cline);
+        strcat(opcode," ");
+    }
+    displayConverted(mnemonics, opcode);
+    free(mnemonics);
+    free(opcode);
     free(cline);
 
+    fclose(mfile);
     fclose(ofile);
 }
 

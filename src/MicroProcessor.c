@@ -47,6 +47,10 @@ void initialize(){
     H = 0;
     L = 0;
     M = 0;
+    PC = 0;
+    SP = 0;
+    PSW = 0;
+    IR = 0;
 
 //Initialize the flags
 

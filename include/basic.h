@@ -13,4 +13,14 @@ static GdkPixbuf *createPixbuf(const gchar* filename){
 	return pixbuf;
 }
 
+void toBinary(int value, char* output)
+{
+    int i;
+    output[9] = '\0';
+    for (i = 7; i >= 0; --i, value >>= 1)
+    {
+        output[i] = (value & 1) + '0';
+    }
+}
+
 #endif
