@@ -1,5 +1,12 @@
 #include "gui.h"
 
+void displayConverted(char* convertedCode){
+    printf("%s\n", convertedCode);
+    printf("%d\n", strlen(convertedCode));
+    GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
+    gtk_text_buffer_set_text(buffer, convertedCode, strlen(convertedCode));
+}
+
 void menuResponse(GtkWidget *menuItems, gpointer data){
 	const char* items = gtk_menu_item_get_label(GTK_MENU_ITEM(menuItems));
 
@@ -40,6 +47,9 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 	menuBar = gtk_menu_bar_new();
 	sep = gtk_separator_menu_item_new();
 	accelGroup = gtk_accel_group_new();
+
+	textAreaConvertedCode = gtk_text_view_new();
+	textAreaYourCode = gtk_text_view_new();
 
 	gtk_window_add_accel_group(GTK_WINDOW(window), accelGroup);
 
@@ -137,8 +147,6 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	micro = gtk_hbox_new(0, 0);
 	hbox = gtk_hbox_new(0, 0);
 	vbox = gtk_vbox_new(0, 0);
-	textAreaYourCode = gtk_text_view_new();
-	textAreaConvertedCode = gtk_text_view_new();
 
 // registers
 	table = gtk_table_new(8, 3, 1);

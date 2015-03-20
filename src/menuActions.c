@@ -68,6 +68,30 @@ void singleStepMenu(GtkWidget* button, gpointer window){
 
 void convertMenu(GtkWidget* button, gpointer window){
     buildMenu(button, window);
+    const size_t total_size = 300;
+    const size_t line_size = 30;
+
+    char* tline = malloc(total_size);
+    char* cline = malloc(line_size);
+    
+    strcpy(tline, " ");
+ 
+    FILE* ofile = fopen("bin/Opcode.txt","r");
+
+    if (!(ofile)){
+        printf("File could not be located");
+        return;
+    }
+
+    while (fgets(cline, line_size, ofile) != NULL){
+        strcat(tline,cline);
+        strcat(tline," ");
+    }
+    displayConverted(tline);
+    free(tline);
+    free(cline);
+
+    fclose(ofile);
 }
 
 //help menu

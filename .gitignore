@@ -1,5 +1,6 @@
 /bin
 /obj
+*.swp
 Thumbs.db
 *.cbp
 *.depend

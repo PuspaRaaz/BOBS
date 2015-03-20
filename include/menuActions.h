@@ -2,6 +2,7 @@
 #define _MENUACTIONS_H_
 
 #include "basic.h"
+#include "gui.h"
 #include "MicroInstruction.h"
 #include "MicroProcessor.h"
 #include <ctype.h>

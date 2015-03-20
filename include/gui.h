@@ -7,6 +7,9 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
+GtkWidget* textAreaYourCode;
+GtkWidget* textAreaConvertedCode;
+
 void menuResponse(GtkWidget*, gpointer);
 
 GtkWidget* drawMenuItems(GtkWidget*);
@@ -14,5 +17,7 @@ GtkWidget* drawMenuItems(GtkWidget*);
 GtkWidget* drawToolbar(GtkWidget*);
 
 GtkWidget* getMicroprocessor(GtkWidget*);
+
+void displayConverted(char*);
 
 #endif

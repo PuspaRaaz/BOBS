@@ -1,4 +1,0 @@
-void Opcode_main()
-{
-
-}
