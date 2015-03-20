@@ -1,30 +1,13 @@
 #include "menuActions.h"
 
-void newFile(GtkWidget* button, gpointer window){
-    g_print("New...\n");
-}
-
-void openFile(GtkWidget* button, gpointer window){
-    GtkWidget *dialog;
-    dialog = gtk_file_chooser_dialog_new("Choose a file", GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
-    gtk_widget_show_all(dialog);
-    gint resp = gtk_dialog_run(GTK_DIALOG(dialog));
-    if(resp == GTK_RESPONSE_OK)
-        g_print("%s\n", gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
-    gtk_widget_destroy(dialog);
-}
+void newFile(GtkWidget* button, gpointer window){}
+void openFile(GtkWidget* button, gpointer window){}
 
 void saveFile(GtkWidget* button, gpointer window){
-    GtkWidget *dialog;
-    dialog = gtk_file_chooser_dialog_new("Save file", GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
-    gtk_widget_show_all(dialog);
-    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER(dialog), TRUE);
-
-    gint resp = gtk_dialog_run(GTK_DIALOG(dialog));
-    if(resp == GTK_RESPONSE_OK)
-        g_print("%s\n", gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog)));
-    gtk_widget_destroy(dialog);
-    g_print("Saved...\n");
+    char* code = getCodedText();
+    FILE* ifile = fopen("bin/Instruction.txt","w");
+    fprintf(ifile, "%s\n", code);
+    fclose(ifile);
 }
 
 //edit menu

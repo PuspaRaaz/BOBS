@@ -20,4 +20,6 @@ GtkWidget* getMicroprocessor(GtkWidget*);
 
 void displayConverted(char*);
 
+char* getCodedText();
+
 #endif

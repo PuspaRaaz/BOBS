@@ -1,8 +1,15 @@
 #include "gui.h"
 
+char* getCodedText(){
+    GtkTextIter start, end;
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(textAreaYourCode));
+	gchar *text;
+	gtk_text_buffer_get_bounds (buffer, &start, &end);
+	text = gtk_text_buffer_get_text (buffer, &start, &end, FALSE);
+	return text;
+}
+
 void displayConverted(char* convertedCode){
-    printf("%s\n", convertedCode);
-    printf("%d\n", strlen(convertedCode));
     GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
     gtk_text_buffer_set_text(buffer, convertedCode, strlen(convertedCode));
 }
@@ -10,8 +17,8 @@ void displayConverted(char* convertedCode){
 void menuResponse(GtkWidget *menuItems, gpointer data){
 	const char* items = gtk_menu_item_get_label(GTK_MENU_ITEM(menuItems));
 
-	if ( strcmp ( items, "New" ) == 0 )		{		newFile(menuItems, data);		}
-	if ( strcmp ( items, "Open" ) == 0 )	{		openFile(menuItems, data);		}
+	// if ( strcmp ( items, "New" ) == 0 )		{		newFile(menuItems, data);		}
+	// if ( strcmp ( items, "Open" ) == 0 )	{		openFile(menuItems, data);		}
 	if ( strcmp ( items, "Save" ) == 0 )	{		saveFile(menuItems, data);		}
 	if ( strcmp ( items, "Quit" ) == 0 )	{		gtk_main_quit();				}
 	if ( strcmp ( items, "Build" ) == 0 )	{		buildMenu(menuItems, data);		}
@@ -98,10 +105,10 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	gtk_container_set_border_width(GTK_CONTAINER(toolbar), 5);
     gtk_toolbar_set_style(GTK_TOOLBAR ( toolbar ), GTK_TOOLBAR_ICONS);
 
-	icon = gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_BUTTON);
-	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "New", "New", "Private", icon, G_CALLBACK(newFile), NULL);
-	icon = gtk_image_new_from_icon_name("gtk-open", GTK_ICON_SIZE_BUTTON);
-	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Open", "Open", "Private", icon, G_CALLBACK(openFile), NULL);
+	// icon = gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_BUTTON);
+	// gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "New", "New", "Private", icon, G_CALLBACK(newFile), NULL);
+	// icon = gtk_image_new_from_icon_name("gtk-open", GTK_ICON_SIZE_BUTTON);
+	// gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Open", "Open", "Private", icon, G_CALLBACK(openFile), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-save", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Save", "Save", "Private", icon, G_CALLBACK(saveFile), NULL);
 	
