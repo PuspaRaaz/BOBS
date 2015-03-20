@@ -55,11 +55,11 @@ void preferencesMenu(GtkWidget* button, gpointer window){
 
 //execute menu
 void buildMenu(GtkWidget* button, gpointer window){
-    g_print("Build...\n");
+    microMain();
 }
 
 void runMenu(GtkWidget* button, gpointer window){
-    g_print("Run...\n");
+    buildMenu(button, window);
 }
 
 void singleStepMenu(GtkWidget* button, gpointer window){
@@ -67,47 +67,7 @@ void singleStepMenu(GtkWidget* button, gpointer window){
 }
 
 void convertMenu(GtkWidget* button, gpointer window){
-    const size_t total_size = 300;
-    const size_t line_size = 30;
-
-    char* tline = (char*) malloc(total_size);
-    char* cline = (char*) malloc(line_size);
-
-    FILE* ifile = fopen("bin/Files/Instruction.bob","r");
-    FILE* ofile = fopen("bin/Files/Opcode.bob","r");
-
-    if (!(ifile)){
-        printf("File could not be located\n");
-        return;
-    }
-    int ch = getc(ifile);
-    char* str;
-    GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
-      while (ch != EOF)
-      {
-        /* To display the contents of the file on the screen */
-        putchar(ch);
-        sprintf(str, "%d", ch);
-        strcat(tline, str);
-     
-        ch = getc(ifile);
-      }
-        gtk_text_buffer_set_text(buffer, tline, 20);
-       
-      if (feof(ifile))
-         printf("\n Reached the end of file.");
-      else
-         printf("\n Something gone wrong.");
-
-    // micro_main(tline,ofile);
-    free(tline);
-    free(cline);
-
-    fclose(ifile);
-    fclose(ofile);
-    GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
-    gtk_text_buffer_set_text(buffer, tline, 20);
-    gtk_text_buffer_paste_clipboard(buffer, clipboard, NULL, TRUE);
+    buildMenu(button, window);
 }
 
 //help menu

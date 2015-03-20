@@ -2,6 +2,8 @@
 #define _MENUACTIONS_H_
 
 #include "basic.h"
+#include "MicroInstruction.h"
+#include "MicroProcessor.h"
 #include <ctype.h>
 #include <gtk/gtk.h>
 #include <stdio.h>

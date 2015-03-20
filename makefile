@@ -17,7 +17,7 @@ LDLIBS := -lSDL2
 CXXFLAGS := -I$(INC_DIR) `pkg-config --cflags gtk+-2.0`
 LDFLAGS := `pkg-config --libs gtk+-2.0`
 ## Build files
-all: bin/output
+## all: bin/output
 $(BIN_DIR)/output: $(OBJ_FILES) | $(BIN_DIR)
 	$(CC) -o $@ $^ $(LDFLAGS) -I$(INC_DIR)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)

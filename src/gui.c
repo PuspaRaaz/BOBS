@@ -50,7 +50,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), items);
 	}
 
-	//file menu items
+// file menu items
 	length = sizeof(fileMenuItemNames) / sizeof(*fileMenuItemNames);
 	for (i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_label(fileMenuItemNames[i]);
@@ -59,7 +59,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		g_signal_connect(items, "activate", G_CALLBACK(menuResponse), (gpointer) window);
 	}
 
-	//execute menu items
+// execute menu items
 	length = sizeof(executeMenuItemNames) / sizeof(*executeMenuItemNames);
 	for (i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_label(executeMenuItemNames[i]);
@@ -68,7 +68,7 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 		g_signal_connect(items, "activate", G_CALLBACK(menuResponse), (gpointer) window);
 	}
 
-	//help menu items
+// help menu items
 	length = sizeof(helpMenuItemNames) / sizeof(*helpMenuItemNames);
 	for (i = 0; i < length; i++){
 		items = gtk_menu_item_new_with_label(helpMenuItemNames[i]);
@@ -140,7 +140,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	textAreaYourCode = gtk_text_view_new();
 	textAreaConvertedCode = gtk_text_view_new();
 
-//registers
+// registers
 	table = gtk_table_new(8, 3, 1);
 	for (i = 0; i < 8; i++){
 		label = gtk_label_new("A");
@@ -163,7 +163,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_container_add(GTK_CONTAINER(frame), table);
 	gtk_box_pack_start(GTK_BOX(hbox), frame, 0, 0, 5);
 
-//flags
+// flags
 	table = gtk_table_new(5, 2, 1);
 	for (i = 0; i < 5; i++){
 		label = gtk_label_new("A");
@@ -181,7 +181,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_box_pack_start(GTK_BOX(hbox), frame, 0, 0, 5);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, 0, 0, 5);
 
-//output ports
+// output ports
 	table = gtk_table_new(3, 5, 1);
 	for (i = 0; i < 3; i++){
 		label = gtk_label_new("Port A");
@@ -198,7 +198,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_container_add(GTK_CONTAINER(frame), table);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
 
-//memory access
+// memory access
 	table = gtk_table_new(1, 3, 0);
 	entry = gtk_entry_new();
 	gtk_entry_set_max_length(GTK_ENTRY(entry), 4);
@@ -210,15 +210,15 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_table_attach(GTK_TABLE(table), entry, 1, 2, 0, 1, GTK_FILL, GTK_FILL, 2, 2);
 	GtkWidget* button = gtk_button_new_with_label("GO");
 	gtk_table_attach(GTK_TABLE(table), button, 2, 3, 0, 1, GTK_FILL, GTK_FILL, 2, 2);
-
 	frame = gtk_frame_new(" Memory\t");
 	gtk_container_add(GTK_CONTAINER(frame), table);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
 	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
 	
+// vertical separator line
 	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
 
-//codearea
+// codearea
 	vbox = gtk_vbox_new(0, 0);
 	hbox = gtk_hbox_new(0, 0);
 	GtkWidget* notebook = gtk_notebook_new();
