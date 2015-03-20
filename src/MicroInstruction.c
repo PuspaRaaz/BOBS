@@ -82,7 +82,6 @@ int Op_val(char in){
 }
 
 int to_opcode(){
-    int Op_count = 0;
     int temp;
     char op1 , op2;
 
@@ -680,7 +679,7 @@ int to_opcode(){
 
         else if (!strcasecmp("LXI",token)){
             get_token();
-            if (!strstr(" B D H SP ",token)){
+            if (!strstr(" B D H SP b d h sp ",token)){
                 ThrowError("NOT a register pair",Op_count);
                 return -1;
             }

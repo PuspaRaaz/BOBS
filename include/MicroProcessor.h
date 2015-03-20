@@ -12,17 +12,8 @@ int start_of_code;
 void ThrowError(char*,int);
 int my_itoa(int val, char* buf);
 
-//flags
-typedef struct {
-    char S,Z,AC,P,C;
-}flags;
-flags Flag;
-
-//registers
-typedef struct {
-    char A,B,C,D,E,H,L,M,SP;
-}registers;
-registers Reg;
+char flag;
+char A,B,C,D,E,H,L,M,SP;
 
 typedef struct{
     int addr;

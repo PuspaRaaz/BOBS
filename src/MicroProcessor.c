@@ -1,15 +1,15 @@
 #include "MicroProcessor.h"
 
-int microMain(){
+int main(){
     start_of_code = 0x8000;
     const size_t total_size = 300;
     const size_t line_size = 30;
 
     char* tline = malloc(total_size);
     char* cline = malloc(line_size);
-    
+
     strcpy(tline, " ");
- 
+
     FILE* ifile = fopen("bin/Instruction.txt","r");
     FILE* ofile = fopen("bin/Opcode.txt","w");
 
@@ -33,30 +33,26 @@ int microMain(){
 
 //Throw error
 void ThrowError(char* message, int pos){
-    displayErrorMessage(message, pos);
+   printf("%s at pos %X ",message,start_of_code+pos);
+   return;
 }
 
 void initialize(){
 
 //Initialize the registers
-    Reg.A = 0;
-    Reg.B = 0;
-    Reg.C = 0;
-    Reg.D = 0;
-    Reg.E = 0;
-    Reg.H = 0;
-    Reg.L = 0;
-    Reg.M = 0;
+    A = 0;
+    B = 0;
+    C = 0;
+    D = 0;
+    E = 0;
+    H = 0;
+    L = 0;
+    M = 0;
 
 //Initialize the flags
 
 
-    Flag.AC = 0;
-    Flag.C = 0;
-    Flag.P = 0;
-    Flag.S = 0;
-    Flag.Z = 0;
-
+    flag = 0;
 
 }
 
