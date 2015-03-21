@@ -163,7 +163,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -182,7 +182,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -201,7 +201,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -239,7 +239,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -258,7 +258,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -277,7 +277,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -296,7 +296,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -328,7 +328,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -347,7 +347,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -465,7 +465,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -484,7 +484,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -503,7 +503,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -522,7 +522,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -541,7 +541,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -560,7 +560,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -579,7 +579,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -598,7 +598,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -617,7 +617,7 @@ int to_opcode(){
                 return -1; // -1 for error
             }
             else{
-                if((temp = Find_Label(token)) == -1){
+                if((temp = Find_Label(token)+1) == -1){
                     ThrowError("Label not found",Op_count);
                     return -1;
                 }
@@ -1165,7 +1165,7 @@ void micro_main(char* instructions, FILE* outfile){
     //convert the code to opcode
     to_opcode();
 
-    Opcode_main(&Op,start_of_code);
+//    Opcode_main(&Op,start_of_code);
 
     print(&Op,Op_count,outfile);
     free(Label_list);
