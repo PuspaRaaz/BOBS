@@ -1,6 +1,6 @@
 #include "MicroProcessor.h"
 
-int main(){
+int microMain(){
     start_of_code = 0x8000;
     const size_t total_size = 300;
     const size_t line_size = 30;
@@ -10,8 +10,8 @@ int main(){
 
     strcpy(tline, " ");
 
-    FILE* ifile = fopen("Instruction.txt","r");
-    FILE* ofile = fopen("Opcode.txt","w");
+    FILE* ifile = fopen("bin/Instruction.txt","r");
+    FILE* ofile = fopen("bin/Opcode.txt","w");
 
     if (!(ifile)){
         printf("File could not be located");
@@ -23,6 +23,7 @@ int main(){
         strcat(tline," ");
     }
     micro_main(tline,ofile);
+    printf("%s\n", tline);
     free(tline);
     free(cline);
 
@@ -33,8 +34,8 @@ int main(){
 
 //Throw error
 void ThrowError(char* message, int pos){
-   printf("found %s at pos %d\n",message,pos);
-   //displayErrorMessage(message, start_of_code+pos);
+   // printf("found %s at pos %d\n",message,pos);
+   displayErrorMessage(message, start_of_code+pos);
 }
 
 void initialize(){

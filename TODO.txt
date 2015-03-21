@@ -2,6 +2,7 @@ DONE:
 - Save
 - Build
 - Convert
+- Flags
 
 TODO:
 -

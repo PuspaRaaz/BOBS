@@ -1,5 +1,24 @@
 #include "gui.h"
 
+// GdkPixbuf *createPixbuf(const gchar* filename){
+// 	GError *error = NULL;
+// 	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(filename, &error);
+// 	if(!pixbuf){
+// 		fprintf(stderr, "%s\n", error->message);
+// 		g_error_free(error);
+// 	}
+// 	return pixbuf;
+// }
+void toBinary(int value, char* output)
+{
+    int i;
+    output[9] = '\0';
+    for (i = 7; i >= 0; --i, value >>= 1)
+    {
+        output[i] = (value & 1) + '0';
+    }
+}
+
 char* getCodedText(){
     GtkTextIter start, end;
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(textAreaYourCode));
@@ -23,6 +42,19 @@ void displayErrorMessage(char* message, int pos){
 	strcat(position, message);
 	GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(errorArea));
     gtk_text_buffer_set_text(buffer, position, strlen(position));
+}
+
+void previousMemory(GtkWidget* button, gpointer data){
+    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
+    gtk_entry_set_text (GTK_ENTRY (memValue), "PREV");
+}
+void setMemory(GtkWidget* button, gpointer data){
+    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
+    gtk_entry_set_text (GTK_ENTRY (memValue), "SET");
+}
+void nextMemory(GtkWidget* button, gpointer data){
+    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
+    gtk_entry_set_text (GTK_ENTRY (memValue), "NEXT");
 }
     
 
@@ -173,6 +205,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gchar* regNames[] = {"A", "BC", "DE", "HL", "PC", "SP", "PSW", "IR"};
 	// gchar* regValues[] = {A, B, C, D, E, H, L, PC, SP, PSW, IR};
 	gchar* regValues[] = {"11", "22", "33", "44", "55", "66", "77", "88", "99", "aa", "bb", "cc", "dd", "ee"};
+	// int regValues[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee};
 
 // registers
 	table = gtk_table_new(8, 3, 1);
@@ -202,21 +235,25 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 
 // flags
 	gchar* flagNames[] = {"S", "Z", "AC", "P", "C"};
-	int flag = 0xaf;
+	int row = 0;
+	int flag = 0xb7;
 	char flagValues[8];
 	toBinary(flag, flagValues);
 	table = gtk_table_new(5, 2, 1);
-	for (i = 0; i < 5; i++){
-		label = gtk_label_new(flagNames[i]);
+	for (i = 0; i < 8; i++){
+		if(i==2 || i==4 || i==6) continue;
+		label = gtk_label_new(flagNames[row]);
 		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
 		gtk_container_add(GTK_CONTAINER(align), label);
-		gtk_table_attach(GTK_TABLE(table), align, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+		gtk_table_attach(GTK_TABLE(table), align, 0, 1, row, row+1, GTK_FILL, GTK_FILL, 5, 5);
 
-		char* val = "1";
+		char val[1];
+		sprintf(val, "%c", flagValues[i]);
 		label = gtk_label_new(val);
 		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
 		gtk_container_add(GTK_CONTAINER(align), label);
-		gtk_table_attach(GTK_TABLE(table), align, 1, 2, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+		gtk_table_attach(GTK_TABLE(table), align, 1, 2, row, row+1, GTK_FILL, GTK_FILL, 5, 5);
+		row++;
 	}
 	frame = gtk_frame_new(" Flags\t");
 	gtk_container_add(GTK_CONTAINER(frame), table);
@@ -224,8 +261,6 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, 0, 0, 5);
 
 // output ports
-
-
 	char binary[8]; int number[3] = {0x84, 0xae, 0x43};
 	char port[20]; int value = 'A';
 
@@ -266,10 +301,13 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	hbox = gtk_hbox_new(0, 0);
 	GtkWidget* button = gtk_button_new_with_label(" << Prev ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	button = gtk_button_new_with_label(" Go ");
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(previousMemory), NULL);
+	button = gtk_button_new_with_label(" Set ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(setMemory), NULL);
 	button = gtk_button_new_with_label(" Next >> ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(nextMemory), NULL);
 	gtk_box_pack_start(GTK_BOX(memVbox), hbox, 0, 0, 1);
 
 	frame = gtk_frame_new(" Memory\t");
@@ -295,7 +333,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
     gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaYourCode);
 	label = gtk_label_new ("YourCode");
 	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
-	
+
 	scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
     gtk_widget_set_size_request(scrolledWindow, 400,300);
 	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(textAreaConvertedCode), 2);

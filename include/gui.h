@@ -1,7 +1,6 @@
 #ifndef _GUI_H
 #define _GUI_H
 
-#include "basic.h"
 #include "menuActions.h"
 #include "MicroProcessor.h"
 #include <gdk/gdkkeysyms.h>
@@ -25,5 +24,7 @@ GtkWidget* getError(GtkWidget*);
 void displayConverted(char*, char*);
 
 char* getCodedText();
+
+void toBinary(int, char*);
 
 #endif

@@ -1,4 +1,3 @@
-#include "basic.h"
 #include "gui.h"
 #include <gtk/gtk.h>
 #include <stdio.h>
@@ -11,7 +10,7 @@ int main(int argc, char** argv){
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(window), "BOBS' Simulator - a 8085 microprocessor simulator");
-	// gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+	gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 	// gtk_window_set_icon(GTK_WINDOW(window), createPixbuf("bin/files/BOBS'.jpg"));
 	g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
