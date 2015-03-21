@@ -6,7 +6,7 @@
 
 #define MAX_TOK_LEN 20 //MAX TOKEN LENGHT
 #define MAX_LABEL_LEN 20
-#define MAX_OP_LEN 1000
+#define MAX_OP_LEN 0x1000
 
 
 typedef enum {

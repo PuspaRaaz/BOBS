@@ -1,14 +1,14 @@
 #include "Stack.h"
 
 void init_stack(){
-    SP = -1;
+    SP = start_of_code + 0x200;
 }
 
 void push(int v){
-    SP ++;
+    SP--;
     value[SP] = v;
 }
 
 int pop(){
-    return value[SP--];
+    return value[SP++];
 }

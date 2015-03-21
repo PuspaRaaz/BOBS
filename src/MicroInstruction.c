@@ -47,6 +47,7 @@ void get_token(){
     //anything other than that
     else if (*input == ','){
         *temp++ = *input++;
+        *temp = '\0';
         token_t = DELIMETER;
 
     }
@@ -693,6 +694,10 @@ int to_opcode(){
                 return -1;
             }
             get_token();
+            if (token_t != NUMBER){
+                ThrowError("NO value provided after lxi",Op_count);
+                return -1;
+            }
             temp = (int) strtol(token,NULL,16);
 
             Append(temp & 0xFF);

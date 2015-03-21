@@ -8,7 +8,7 @@
 #include "Stack.h"
 
 //start of the code
-int start_of_code;
+#define start_of_code 0x8000
 
 void ThrowError(char*,int);
 int my_itoa(int val, char* buf);

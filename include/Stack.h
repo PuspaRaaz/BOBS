@@ -1,6 +1,7 @@
 #pragma once
 
-int value[800];
+#include "MicroProcessor.h"
+int value[0x200];
 int SP;
 
 void init_stack();
