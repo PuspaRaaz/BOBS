@@ -43,6 +43,8 @@ void buildMenu(GtkWidget* button, gpointer window){
 
 void runMenu(GtkWidget* button, gpointer window){
     buildMenu(button, window);
+    int regVal[] = {A, B, C, D, E, H, L, PC, SP};
+    
 }
 
 void singleStepMenu(GtkWidget* button, gpointer window){

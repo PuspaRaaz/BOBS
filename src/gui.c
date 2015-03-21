@@ -1,22 +1,38 @@
 #include "gui.h"
 
-// GdkPixbuf *createPixbuf(const gchar* filename){
-// 	GError *error = NULL;
-// 	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(filename, &error);
-// 	if(!pixbuf){
-// 		fprintf(stderr, "%s\n", error->message);
-// 		g_error_free(error);
-// 	}
-// 	return pixbuf;
-// }
 void toBinary(int value, char* output)
 {
     int i;
-    output[9] = '\0';
-    for (i = 7; i >= 0; --i, value >>= 1)
-    {
+    output[8] = '\0';
+    for (i = 7; i >= 0; --i, value >>= 1){
         output[i] = (value & 1) + '0';
     }
+}
+void displayFlag(){
+	int flag[] = {getsign(), getzero(), getAF(), getparity(), getcarry()};
+	int i;
+	for (i = 0; i < 5; i++){
+		char value[2];
+		sprintf(value, "%d", flag[i]);
+		gtk_entry_set_text(GTK_ENTRY(flagEntry[i]), value);
+	}
+}
+void displayRegister(){
+	int registerIntValue[] = {A, B, C, D, E, H, L, PC+STARTOFCODE, SP};
+	int i;
+	for (i = 0; i < 9; i++){
+		char value[2];
+		sprintf(value, "%X", registerIntValue[i]);
+		gtk_entry_set_text(GTK_ENTRY(registerEntry[i]), value);
+	}
+}
+void displayIOPort(){
+	int outputValue[] = {Port[0], Port[1], Port[2]};
+	int i; char binaryOutputValue[8];
+	for (i = 0; i < 3; i++){
+		toBinary(outputValue[i], binaryOutputValue);
+		gtk_entry_set_text(GTK_ENTRY(ioPortEntry[i]), binaryOutputValue);
+	}
 }
 
 char* getCodedText(){
@@ -34,6 +50,9 @@ void displayConverted(char* mnemonics, char* opcode){
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
     gtk_text_buffer_set_text(buffer, opcode, strlen(opcode));
     gtk_notebook_next_page (GTK_NOTEBOOK(notebook));
+    displayFlag();
+    displayRegister();
+    displayIOPort();
 }
 
 void displayErrorMessage(char* message, int pos){
@@ -45,16 +64,63 @@ void displayErrorMessage(char* message, int pos){
 }
 
 void previousMemory(GtkWidget* button, gpointer data){
-    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
-    gtk_entry_set_text (GTK_ENTRY (memValue), "PREV");
+	int memAddress, memoryValueInt = 100;
+	char memoryValue[5], memoryAddress[4];
+
+	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
+	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
+
+    memAddress = (int) strtol(memoryAddressConst, NULL, 16);
+
+    if (memAddress > 0x8000 && memAddress < STARTOFCODE+MAX_OP_LEN) memAddress--;
+    else memAddress = STARTOFCODE;
+
+    memoryValueInt = Op[memAddress - STARTOFCODE].value;
+
+    sprintf(memoryAddress, "%X", memAddress);
+    sprintf(memoryValue, "%X", memoryValueInt);
+
+    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
 }
 void setMemory(GtkWidget* button, gpointer data){
-    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
-    gtk_entry_set_text (GTK_ENTRY (memValue), "SET");
+	char memoryAddress[4], memoryValue[4];
+	
+	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
+	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
+
+	buffer = gtk_entry_get_buffer (GTK_ENTRY(memValue));
+	const char* memoryValueConst = gtk_entry_buffer_get_text (buffer);
+
+    int memAddressInt = (int) strtol(memoryAddressConst, NULL, 16);
+    int memValueInt = (int) strtol(memoryValueConst, NULL, 16);
+    sprintf(memoryAddress, "%X", memAddressInt);
+    sprintf(memoryValue, "%X", memValueInt);
+
+    Op[memAddressInt - STARTOFCODE].value = memValueInt;
+
+    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
 }
 void nextMemory(GtkWidget* button, gpointer data){
-    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
-    gtk_entry_set_text (GTK_ENTRY (memValue), "NEXT");
+	int memAddress, memoryValueInt = 100;
+	char memoryValue[5], memoryAddress[4];
+
+	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
+	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
+
+    memAddress = (int) strtol(memoryAddressConst, NULL, 16);
+
+    if (memAddress >= 0x8000 && memAddress < STARTOFCODE+MAX_OP_LEN-1) memAddress++;
+    else memAddress = STARTOFCODE;
+
+    memoryValueInt = Op[memAddress - STARTOFCODE].value;
+
+    sprintf(memoryAddress, "%X", memAddress);
+    sprintf(memoryValue, "%X", memoryValueInt);
+
+    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
 }
     
 
@@ -202,84 +268,76 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	vbox = gtk_vbox_new(0, 0);
 	font_desc = pango_font_description_from_string ("Serif 15");
 
-	gchar* regNames[] = {"A", "BC", "DE", "HL", "PC", "SP", "PSW", "IR"};
-	// gchar* regValues[] = {A, B, C, D, E, H, L, PC, SP, PSW, IR};
-	gchar* regValues[] = {"11", "22", "33", "44", "55", "66", "77", "88", "99", "aa", "bb", "cc", "dd", "ee"};
-	// int regValues[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee};
+	gchar* regNames[] = {"A", "BC", "DE", "HL", "PC", "SP"};
 
 // registers
-	table = gtk_table_new(8, 3, 1);
+	table = gtk_table_new(6, 4, 0);
+	for (i = 0; i < 9; i++){
+		registerEntry[i] = gtk_entry_new();
+		gtk_editable_set_editable(GTK_EDITABLE(registerEntry[i]), FALSE);
+		gtk_entry_set_max_length(GTK_ENTRY(registerEntry[i]), 4);
+		gtk_widget_set_size_request(registerEntry[i], 25, 25);
+	}
 	int pos = 0;
-	for (i = 0; i < 8; i++){
+	for (i = 0; i < 6; i++){
 		label = gtk_label_new(regNames[i]);
-		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
-		gtk_container_add(GTK_CONTAINER(align), label);
-		gtk_table_attach(GTK_TABLE(table), align, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
-
+		gtk_table_attach(GTK_TABLE(table), label, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
 		for (j = 0; j < 2; j++){
-			if ((i == 0) || (i == 7)){
-				label = gtk_label_new(regValues[pos]);
-				gtk_table_attach(GTK_TABLE(table), label, 1, 3, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+			if (i != 1 && i != 2 && i !=3){
+				gtk_table_attach(GTK_TABLE(table), registerEntry[pos], 2, 4, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
 				pos++;
 				j++;
 			}else{
-				label = gtk_label_new(regValues[pos]);
-				gtk_table_attach(GTK_TABLE(table), label, j+1, j+2, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+				gtk_table_attach(GTK_TABLE(table), registerEntry[pos], j+2, j+3, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
 				pos++;
 			}
 		}
 	}
+    displayRegister();
 	frame = gtk_frame_new(" Registers\t");
 	gtk_container_add(GTK_CONTAINER(frame), table);
-	gtk_box_pack_start(GTK_BOX(hbox), frame, 0, 0, 5);
+	gtk_box_pack_start(GTK_BOX(hbox), frame, 1, 0, 5);
 
 // flags
 	gchar* flagNames[] = {"S", "Z", "AC", "P", "C"};
-	int row = 0;
-	int flag = 0xb7;
-	char flagValues[8];
-	toBinary(flag, flagValues);
-	table = gtk_table_new(5, 2, 1);
-	for (i = 0; i < 8; i++){
-		if(i==2 || i==4 || i==6) continue;
-		label = gtk_label_new(flagNames[row]);
-		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
-		gtk_container_add(GTK_CONTAINER(align), label);
-		gtk_table_attach(GTK_TABLE(table), align, 0, 1, row, row+1, GTK_FILL, GTK_FILL, 5, 5);
-
-		char val[1];
-		sprintf(val, "%c", flagValues[i]);
-		label = gtk_label_new(val);
-		align = gtk_alignment_new(0.0, 0.5, 0.0, 0.0);
-		gtk_container_add(GTK_CONTAINER(align), label);
-		gtk_table_attach(GTK_TABLE(table), align, 1, 2, row, row+1, GTK_FILL, GTK_FILL, 5, 5);
-		row++;
+	for (i = 0; i < 5; i++){
+		flagEntry[i] = gtk_entry_new();
+		gtk_editable_set_editable(GTK_EDITABLE(flagEntry[i]), FALSE);
+		gtk_entry_set_max_length(GTK_ENTRY(flagEntry[i]), 1);
+		gtk_widget_set_size_request(flagEntry[i], 15, 25);
 	}
+	table = gtk_table_new(5, 2, 1);
+	for (i = 0; i < 5; i++){
+		label = gtk_label_new(flagNames[i]);
+		gtk_table_attach(GTK_TABLE(table), label, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+
+		gtk_table_attach(GTK_TABLE(table), flagEntry[i], 1, 2, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+	}
+    displayFlag();
 	frame = gtk_frame_new(" Flags\t");
 	gtk_container_add(GTK_CONTAINER(frame), table);
 	gtk_box_pack_start(GTK_BOX(hbox), frame, 0, 0, 5);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, 0, 0, 5);
 
 // output ports
-	char binary[8]; int number[3] = {0x84, 0xae, 0x43};
-	char port[20]; int value = 'A';
-
 	table = gtk_table_new(3, 2, 0);
 	for (i = 0; i < 3; i++){
-		sprintf(port, "%c", value + i);
+		ioPortEntry[i] = gtk_entry_new();
+		gtk_widget_modify_font (ioPortEntry[i], font_desc);
+		gtk_editable_set_editable(GTK_EDITABLE(ioPortEntry[i]), FALSE);
+		gtk_entry_set_max_length(GTK_ENTRY(ioPortEntry[i]), 8);
+		gtk_widget_set_size_request(ioPortEntry[i], 120, 35);
+	}
+	for (i = 0; i < 3; i++){
+		char port[2];
+		sprintf(port, "%c :-", 'A' + i);
 		label = gtk_label_new(port);
 		gtk_table_attach(GTK_TABLE(table), label, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 7, 7);
 
-		toBinary(number[i], binary);
-		entry = gtk_entry_new();
-		gtk_widget_modify_font (entry, font_desc);
-	    gtk_entry_set_text (GTK_ENTRY (entry), binary);
-		gtk_editable_set_editable (GTK_EDITABLE (entry), FALSE);
-		gtk_entry_set_max_length(GTK_ENTRY(entry), 8);
-		gtk_widget_set_size_request(entry, 120, 35);
-		gtk_table_attach(GTK_TABLE(table), entry, 1, 2, i, i+1, GTK_FILL, GTK_FILL, 7, 7);
+		gtk_table_attach(GTK_TABLE(table), ioPortEntry[i], 1, 2, i, i+1, GTK_FILL, GTK_FILL, 7, 7);
 	}
-	frame = gtk_frame_new(" O/P Ports\t");
+    displayIOPort();
+    frame = gtk_frame_new(" O/P Ports\t");
 	gtk_container_add(GTK_CONTAINER(frame), table);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
 
@@ -288,11 +346,17 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	GtkWidget* memVbox = gtk_vbox_new(0, 0);
 	memLocation = gtk_entry_new();
 	gtk_widget_modify_font (memLocation, font_desc);
+    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
 	gtk_entry_set_max_length(GTK_ENTRY(memLocation), 4);
 	gtk_widget_set_size_request(memLocation, 120, 40);
 	gtk_box_pack_start(GTK_BOX(hbox), memLocation, 0, 0, 5);
+
 	memValue = gtk_entry_new();
 	gtk_widget_modify_font (memValue, font_desc);
+    int memoryValueInt = Op[0].value;
+    char memoryValue[5];
+    sprintf(memoryValue, "%X", memoryValueInt);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
 	gtk_entry_set_max_length(GTK_ENTRY(memValue), 2);
 	gtk_widget_set_size_request(memValue, 60, 40);
 	gtk_box_pack_start(GTK_BOX(hbox), memValue, 0, 0, 5);
@@ -365,3 +429,15 @@ GtkWidget* getError(GtkWidget* window){
 
     return frame;
 }
+
+/*
+GdkPixbuf *createPixbuf(const gchar* filename){
+	GError *error = NULL;
+	GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(filename, &error);
+	if(!pixbuf){
+		fprintf(stderr, "%s\n", error->message);
+		g_error_free(error);
+	}
+	return pixbuf;
+}
+*/

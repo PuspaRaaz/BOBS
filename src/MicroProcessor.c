@@ -2,7 +2,8 @@
 
 int microMain(){
     initialize();
-	 start_of_code = 0x8000;
+    start_of_code = 0x8000;
+
     const size_t total_size = 300;
     const size_t line_size = 30;
 
