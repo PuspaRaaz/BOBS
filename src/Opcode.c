@@ -320,9 +320,56 @@ void Eval_Opcode(int value){
         int lo = opcode[PC+1].value;
         int up = opcode[PC+2].value;
 
-        PC = (up << 8) + lo - start_of_code;
+        PC = (up << 8) + lo - start_of_code + 1;
         Evaluate(PC);
     }
+
+    else if (value == 0xCD){
+        ///CALL LABEL
+        int tempPC = PC + 3;
+        push(tempPC);
+
+        int lo = opcode[PC+1].value;
+        int up = opcode[PC+2].value;
+
+        PC = (up << 8) + lo - start_of_code + 1;
+        Evaluate(PC);
+
+    }
+
+    else if (value == 0xDC){
+        ///CC LABEL
+        //if carry flag is 0
+        if (getcarry() == 0)
+            return;
+
+        int tempPC = PC + 3;
+        push(tempPC);
+
+        int lo = opcode[PC+1].value;
+        int up = opcode[PC+2].value;
+
+        PC = (up << 8) + lo - start_of_code + 1;
+        Evaluate(PC);
+    }
+
+    else if (value == 0xFC){
+        ///CM LABEL
+        //if not a minus sign
+        if (getsign() == 0)
+            return;
+
+        int tempPC = PC + 3;
+        push(tempPC);
+
+        int lo = opcode[PC+1].value;
+        int up = opcode[PC+2].value;
+
+        PC = (up << 8) + lo - start_of_code + 1;
+        Evaluate(PC);
+
+    }
+
 
     else if (value == 0xC9){
         ///RET
