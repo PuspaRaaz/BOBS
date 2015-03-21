@@ -2,7 +2,6 @@
 #define OPCODE_H_
 
 #include "MicroProcessor.h"
-#include "Stack.h"
 
 //Global variables used
 Memory* opcode;

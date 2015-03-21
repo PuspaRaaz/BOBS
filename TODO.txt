@@ -5,4 +5,4 @@ DONE:
 - Flags
 
 TODO:
--
+-DID UPTO LDA

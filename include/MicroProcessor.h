@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "Stack.h"
 
 //start of the code
 int start_of_code;
@@ -13,7 +14,9 @@ void ThrowError(char*,int);
 int my_itoa(int val, char* buf);
 
 int flag;
-int A,B,C,D,E,H,L,M,SP,PC,PSW,IR;
+int Port[3];
+int baseADD;
+int A,B,C,D,E,H,L,M,PC,PSW,IR;
 
 typedef struct{
     int addr;
@@ -26,6 +29,7 @@ int getcarry();
 int getsign();
 int getparity();
 int getAF();
+int Parity(int n);
 
 void setzero();
 void resetzero();

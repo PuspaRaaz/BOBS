@@ -1165,7 +1165,7 @@ void micro_main(char* instructions, FILE* outfile){
     //convert the code to opcode
     to_opcode();
 
-//    Opcode_main(&Op,start_of_code);
+    Opcode_main(&Op,start_of_code);
 
     print(&Op,Op_count,outfile);
     free(Label_list);

@@ -1,6 +1,6 @@
 #include "MicroProcessor.h"
 
-int microMain(){
+int main(){
     start_of_code = 0x8000;
     const size_t total_size = 300;
     const size_t line_size = 30;
@@ -10,8 +10,8 @@ int microMain(){
 
     strcpy(tline, " ");
 
-    FILE* ifile = fopen("bin/Instruction.txt","r");
-    FILE* ofile = fopen("bin/Opcode.txt","w");
+    FILE* ifile = fopen("Instruction.txt","r");
+    FILE* ofile = fopen("Opcode.txt","w");
 
     if (!(ifile)){
         printf("File could not be located");
@@ -23,7 +23,6 @@ int microMain(){
         strcat(tline," ");
     }
     micro_main(tline,ofile);
-    printf("%s\n", tline);
     free(tline);
     free(cline);
 
@@ -34,8 +33,8 @@ int microMain(){
 
 //Throw error
 void ThrowError(char* message, int pos){
-   // printf("found %s at pos %d\n",message,pos);
-   displayErrorMessage(message, start_of_code+pos);
+   printf("found %s at pos %d\n",message,pos);
+   //displayErrorMessage(message, start_of_code+pos);
 }
 
 void initialize(){
@@ -50,14 +49,20 @@ void initialize(){
     L = 0;
     M = 0;
     PC = 0;
-    SP = 0;
     PSW = 0;
     IR = 0;
 
 //Initialize the flags
-
-
     flag = 0;
+
+//initialize stack
+    init_stack();
+
+//Base address
+    baseADD = 40;
+    Port[0] = 0;
+    Port[1] = 0;
+    Port[2] = 0;
 
 }
 
@@ -123,6 +128,15 @@ int getAF(){
     return (flag >> 4) & 1;
 }
 
+int Parity(int x){
+    int p = 1;
+    while (x){
+        p ^= x&1;
+        x >>= 1; // at each iteration, we shift the input one bit to the right
+    }
+    return !p;
+}
+
 void setzero(){
     flag |= (1 << 6);
 }
@@ -157,6 +171,7 @@ void resetAF() {
 void complement_carry() {
     flag ^= 1 << 0;
 }
+
 
 
 
