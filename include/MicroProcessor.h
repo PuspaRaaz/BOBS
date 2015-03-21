@@ -14,7 +14,7 @@ void ThrowError(char*,int);
 int my_itoa(int val, char* buf);
 
 int flag;
-int Port[3];
+int Port[4];
 int baseADD;
 int A,B,C,D,E,H,L,M,PC,PSW,IR;
 
