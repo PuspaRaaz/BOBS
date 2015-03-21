@@ -1,6 +1,6 @@
 #include "MicroProcessor.h"
 
-int microMain(){
+int main(){
     start_of_code = 0x8000;
     const size_t total_size = 300;
     const size_t line_size = 30;
@@ -10,8 +10,8 @@ int microMain(){
 
     strcpy(tline, " ");
 
-    FILE* ifile = fopen("bin/Instruction.txt","r");
-    FILE* ofile = fopen("bin/Opcode.txt","w");
+    FILE* ifile = fopen("Instruction.txt","r");
+    FILE* ofile = fopen("Opcode.txt","w");
 
     if (!(ifile)){
         printf("File could not be located");
@@ -33,7 +33,8 @@ int microMain(){
 
 //Throw error
 void ThrowError(char* message, int pos){
-   displayErrorMessage(message, start_of_code+pos);
+   printf("found %s at pos %d\n",message,pos);
+   //displayErrorMessage(message, start_of_code+pos);
 }
 
 void initialize(){
@@ -103,4 +104,58 @@ int my_itoa(int val, char* buf)
 }
 
 */
+
+int getzero(){
+    return (flag >> 6) & 1;
+}
+
+int getcarry(){
+    return (flag >> 0) & 1;
+}
+int getsign(){
+    return (flag >> 7) & 1;
+}
+int getparity(){
+    return (flag >> 2) & 1;
+}
+int getAF(){
+    return (flag >> 4) & 1;
+}
+
+void setzero(){
+    flag |= (1 << 6);
+}
+void resetzero() {
+    flag &= ~(1 << 6);
+}
+void setcarry() {
+    flag |= (1 << 0);
+}
+void resetcarry() {
+    flag &= ~(1 << 0);
+}
+void setsign() {
+    flag |= (1 << 7);
+}
+void resetsign() {
+    flag &= ~(1 << 7);
+}
+void setparity() {
+    flag |= (1 << 2);
+}
+void resetparity() {
+    flag &= ~(1 << 2);
+}
+void setAF() {
+    flag |= (1 << 4);
+}
+void resetAF() {
+    flag &= ~(1 << 4);
+}
+
+void complement_carry() {
+    flag ^= 1 << 0;
+}
+
+
 

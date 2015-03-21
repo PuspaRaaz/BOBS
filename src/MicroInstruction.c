@@ -1,6 +1,5 @@
 #include "MicroInstruction.h"
 
-
 void get_token(){
     char* temp = token;
     //skip over spaces
@@ -59,16 +58,12 @@ void get_token(){
 
 void Increase_O_pos(char* instruction){
     int i;
-    for (i=0;i<strlen(instruction);i++)
-        instruction[i] = toupper(instruction[i]);
-
     if (strstr(" ADC ADD ANA CMA CMC CMP DAA DAD DCR DCX DI EI HLT INR INX LDAX MOV NOP ORA PCHL POP PUSH RAL RAR RC RET RIM RLC RM RNC RNZ RP RPE RPO RRC RST SBB SIM SPHL STAX STC SUB XCHG XRA XYHL", instruction)) Op_count += 1;
     if (strstr(" ACI ADI ANI CPI IN MVI ORI OUT SBI SUI XRI ", instruction)) Op_count += 2;
     if (strstr(" CALL CC CM CNC CNZ CP CPE CPO CZ JC JM JMP JNC JNZ JP JPE JPO JZ LDA LHLD LXI SHLD STA ",instruction)) Op_count += 3;
 }
 
 int Op_val(char in){
-    in = toupper(in);
     switch (in){
         case 'A': return 0x7; break;
         case 'B': return 0x0; break;
@@ -107,7 +102,7 @@ int to_opcode(){
                 ThrowError("ADC requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0x88 + Op_val(op1);
             Append(temp);
         }
@@ -118,7 +113,7 @@ int to_opcode(){
                 ThrowError("ADC requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0x80 + Op_val(op1);
             Append(temp);
         }
@@ -142,7 +137,7 @@ int to_opcode(){
                 ThrowError("ANA requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0xA0 + Op_val(op1);
             Append(temp);
         }
@@ -231,7 +226,7 @@ int to_opcode(){
                 ThrowError("CMP requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0xB8 + Op_val(op1);
             Append(temp);
         }
@@ -389,7 +384,7 @@ int to_opcode(){
                 ThrowError("DCR requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0x05 + Op_val(op1)*8;
             Append(temp);
         }
@@ -441,7 +436,7 @@ int to_opcode(){
                 ThrowError("INR requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0x04 + Op_val(op1)*8;
             Append(temp);
         }
@@ -650,7 +645,7 @@ int to_opcode(){
 
         else if (!strcasecmp("LDAX",token)){
             get_token();
-            if (!strstr(" B D ",token)){
+            if (!strstr(" B D b d ",token)){
                 ThrowError("NOT a register pair B or D",Op_count);
                 return -1;
             }
@@ -671,15 +666,15 @@ int to_opcode(){
             }
             else{
                 temp = (int) strtol(token,NULL,16);
-                Append(temp & 0x00FF);
-                Append(temp & 0xFF00);
+                Append(temp & 0xFF);
+                Append((temp & 0xFF00) >> 8);
             }
 
         }
 
         else if (!strcasecmp("LXI",token)){
             get_token();
-            if (!strstr(" B D H SP b d h sp ",token)){
+            if (!strstr(" B D H SP ",token)){
                 ThrowError("NOT a register pair",Op_count);
                 return -1;
             }
@@ -700,8 +695,8 @@ int to_opcode(){
             get_token();
             temp = (int) strtol(token,NULL,16);
 
-            Append(temp & 0x00FF);
-            Append(temp & 0xFF00);
+            Append(temp & 0xFF);
+            Append((temp & 0xFF00)>>8);
 
         }
 
@@ -725,7 +720,6 @@ int to_opcode(){
                     op2 = *token;
                 }
             }
-            op1 = toupper(op1) ;op2 = toupper(op2);
 
             if(op1 == 'A'){
                 temp = 0x78 + Op_val(op2);
@@ -812,7 +806,7 @@ int to_opcode(){
                 ThrowError("ORA requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0xB0 + Op_val(op1);
             Append(temp);
         }
@@ -957,7 +951,7 @@ int to_opcode(){
                 ThrowError("SBB requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0x98 + Op_val(op1);
             Append(temp);
         }
@@ -985,7 +979,7 @@ int to_opcode(){
             else{
                 temp = (int) strtol(token,NULL,16);
                 Append(temp & 0x00FF);
-                Append(temp & 0xFF00);
+                Append((temp & 0xFF00)>>8);
             }
 
         }
@@ -1008,7 +1002,7 @@ int to_opcode(){
             else{
                 temp = (int) strtol(token,NULL,16);
                 Append(temp & 0x00FF);
-                Append(temp & 0xFF00);
+                Append((temp & 0xFF00)>>8);
             }
 
         }
@@ -1037,7 +1031,7 @@ int to_opcode(){
                 ThrowError("SUB requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0x90 + Op_val(op1);
             Append(temp);
         }
@@ -1065,7 +1059,7 @@ int to_opcode(){
                 ThrowError("ORA requires a REG/MEM", Op_count);
                 return -1;
             }
-            op1 = toupper(*token);
+            op1 = *token;
             temp = 0xA8 + Op_val(op1);
             Append(temp);
         }
@@ -1088,7 +1082,7 @@ int to_opcode(){
         }
 
         else if (!strcasecmp(" ",token)){
-            
+
         }
 
         else{
@@ -1157,6 +1151,10 @@ void micro_main(char* instructions, FILE* outfile){
     input = instructions;
     Op_count = 0;
 
+    int i;
+    for (i=0;i<strlen(input);i++)
+        input[i] = toupper(input[i]);
+
     Label_list = (label*) malloc (MAX_LABEL_LEN*sizeof(label));
     token = (char*) malloc(MAX_TOK_LEN*sizeof(char));
 
@@ -1166,6 +1164,8 @@ void micro_main(char* instructions, FILE* outfile){
     To_Start();
     //convert the code to opcode
     to_opcode();
+
+    Opcode_main(&Op,start_of_code);
 
     print(&Op,Op_count,outfile);
     free(Label_list);

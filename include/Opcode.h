@@ -2,14 +2,16 @@
 #define OPCODE_H_
 
 #include "MicroProcessor.h"
+#include "Stack.h"
 
 //Global variables used
-int pos;
 Memory* opcode;
-
+int hasHalted;
 //Function used
-void Opcode_main(Memory* Op, int Op_count);
+void Opcode_main(Memory* Op,int pCounter);
 void Eval_Opcode(int value);
-
+void updateFlags(int regA, int op1, int op2);
+void Evaluate(int pCounter);
+void printflags();
 //Opcode lists
 #endif
