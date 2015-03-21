@@ -1,5 +1,30 @@
 #include "gui.h"
 
+void timerStart(){
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ti");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "me");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "r.");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "..");
+}
+void timerPause(){
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ti");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "me");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "r.");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "..");
+}
+void timerStop(){
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ti");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "me");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "r.");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "..");
+}
+void timerReset(){
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "00");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "00");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "00");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "00");
+}
+
 void toBinary(int value, char* output)
 {
     int i;
@@ -409,6 +434,42 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
     gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaConvertedCode);
 	label = gtk_label_new ("ConvertedCode");
 	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
+
+// vertical separator line
+	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
+
+//timer
+	GtkWidget *rightVBox = gtk_vbox_new(0, 0);
+	hbox = gtk_hbox_new(0, 0);
+	for (i = 0; i < 4; i++){
+		timerEntry[i] = gtk_entry_new();
+		gtk_editable_set_editable(GTK_EDITABLE(timerEntry[i]), FALSE);
+		gtk_entry_set_max_length(GTK_ENTRY(timerEntry[i]), 2);
+		gtk_widget_modify_font (timerEntry[i], font_desc);
+		gtk_widget_set_size_request(timerEntry[i], 50, 35);
+		gtk_box_pack_start(GTK_BOX(hbox), timerEntry[i], 1, 1, 1);
+	}
+	gtk_box_pack_start(GTK_BOX(rightVBox), hbox, 1, 1, 5);
+
+	hbox = gtk_hbox_new(0, 0);
+	button = gtk_button_new_with_label(" Start ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStart), NULL);
+	button = gtk_button_new_with_label(" Pause ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerPause), NULL);
+	button = gtk_button_new_with_label(" Stop ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStop), NULL);
+	button = gtk_button_new_with_label(" Reset ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerReset), NULL);
+	gtk_box_pack_start(GTK_BOX(rightVBox), hbox, 0, 0, 1);
+
+	frame = gtk_frame_new(" Timer\t");
+	gtk_container_add(GTK_CONTAINER(frame), rightVBox);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 1);
+	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
 
 	pango_font_description_free (font_desc);
 	return micro;

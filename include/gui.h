@@ -12,24 +12,23 @@
 #include <string.h>
 
 #define STARTOFCODE 0x8000
-GtkWidget *textAreaYourCode, *textAreaConvertedCode, *errorArea, *notebook, *memLocation, *memValue;
+
+GtkWidget *timerEntry[4];
 GtkWidget *flagEntry[5], *registerEntry[9], *ioPortEntry[3];
+GtkWidget *textAreaYourCode, *textAreaConvertedCode, *errorArea, *notebook, *memLocation, *memValue;
 PangoFontDescription* font_desc;
 
-void menuResponse(GtkWidget*, gpointer);
-
 GtkWidget* drawMenuItems(GtkWidget*);
-
 GtkWidget* drawToolbar(GtkWidget*);
-
-GtkWidget* getMicroprocessor(GtkWidget*);
-
 GtkWidget* getError(GtkWidget*);
-
-void displayConverted(char*, char*);
-
+GtkWidget* getMicroprocessor(GtkWidget*);
 char* getCodedText();
-
+void displayConverted(char*, char*);
+void menuResponse(GtkWidget*, gpointer);
+void timerStart();
+void timerPause();
+void timerStop();
+void timerReset();
 void toBinary(int, char*);
 
 #endif
