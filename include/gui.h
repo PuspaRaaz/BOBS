@@ -23,7 +23,7 @@ GtkWidget* drawToolbar(GtkWidget*);
 GtkWidget* getError(GtkWidget*);
 GtkWidget* getMicroprocessor(GtkWidget*);
 char* getCodedText();
-void displayConverted(char*, char*);
+void displayConverted();
 void displayErrorMessage(char*, int);
 void displayFlag();
 void displayIOPort();

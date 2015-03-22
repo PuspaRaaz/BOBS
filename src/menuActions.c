@@ -8,9 +8,10 @@ void saveFile(GtkWidget* button, gpointer window){
     FILE* ifile = fopen("bin/Instruction.txt","w");
     fprintf(ifile, "%s\n", code);
     fclose(ifile);
+    char * message = "File save successful.";
+    displayErrorMessage(message, start_of_code+PC);
 }
 
-//edit menu
 void cutMenu(GtkWidget* button, GtkTextView* textView){
     GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
     GtkTextBuffer* buffer = gtk_text_view_get_buffer(textView);
@@ -32,116 +33,36 @@ void pasteMenu(GtkWidget* button, GtkTextView* textView){
     gtk_text_buffer_paste_clipboard(buffer, clipboard, NULL, TRUE);
 }
 
-void preferencesMenu(GtkWidget* button, gpointer window){
-    g_print("Preferences...\n");
-}
-
-//execute menu
 void buildMenu(GtkWidget* button, gpointer window){
     microMain();
+    built = 1;
+    char * message = "Program successfully built.";
+    displayErrorMessage(message, start_of_code+PC);
 }
 
 void runMenu(GtkWidget* button, gpointer window){
-    buildMenu(button, window);
-    int regVal[] = {A, B, C, D, E, H, L, PC, SP};
-    
+    convertMenu(button, window);
+    RunOpcode();
+    refresh();
+    built = 0;
+    char * message = "Program successfully executed.";
+    displayErrorMessage(message, start_of_code+PC);
 }
 
 void singleStepMenu(GtkWidget* button, gpointer window){
-    g_print("Single Step...\n");
+    if (!built){
+        convertMenu(button, window);
+    }
+    SingleStep();
+    refresh();
+    if (hasHalted) return;
 }
 
 void convertMenu(GtkWidget* button, gpointer window){
     buildMenu(button, window);
-    const size_t total_size = 300;
-    const size_t line_size = 30;
-
-    char* mnemonics = malloc(total_size);
-    char* opcode = malloc(total_size);
-    char* cline = malloc(line_size);
-    
-    strcpy(mnemonics, " ");
-    strcpy(opcode, " ");
- 
-    FILE* mfile = fopen("bin/Instruction.txt","r");
-    FILE* ofile = fopen("bin/Opcode.txt","r");
-
-    if (!(ofile) || (!mfile)){
-        printf("File could not be located");
-        return;
-    }
-
-    while (fgets(cline, line_size, mfile) != NULL){
-        strcat(mnemonics,cline);
-        strcat(mnemonics," ");
-    }
-    while (fgets(cline, line_size, ofile) != NULL){
-        strcat(opcode,cline);
-        strcat(opcode," ");
-    }
-    displayConverted(mnemonics, opcode);
-    free(mnemonics);
-    free(opcode);
-    free(cline);
-
-    fclose(mfile);
-    fclose(ofile);
-}
-
-//help menu
-void instructionDialog(GtkWidget* button, gpointer window){
-    GtkWidget* dialog, *label, *image, *vbox;
-
-    dialog = gtk_dialog_new_with_buttons("Instructions", GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, NULL);
-    gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
-    gtk_window_set_modal(GTK_WINDOW(dialog), FALSE);
-
-    vbox = gtk_vbox_new(0,0);
-
-    image = gtk_image_new_from_stock(GTK_STOCK_INFO, GTK_ICON_SIZE_DIALOG);
-    gtk_box_pack_start(GTK_BOX(vbox), image, 0, 0, 0);
-
-    label = gtk_label_new("BOBS' Simulator");
-    gtk_box_pack_start(GTK_BOX(vbox), label, 0, 0, 0);
-
-    GtkWidget* sep = gtk_separator_menu_item_new();
-    gtk_box_pack_start(GTK_BOX(vbox), sep, 0, 0, 0);
-
-    label = gtk_label_new("\nHere comes instruction set and their respective opcode.\n");
-    gtk_box_pack_start(GTK_BOX(vbox), label, 0, 0, 0);
-    
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox, 0, 0, 0);
-
-    gtk_widget_show_all(dialog);
-    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-}
-
-void helpDialog(GtkWidget* button, gpointer window){
-    GtkWidget* dialog, *label, *image, *vbox;
-
-    dialog = gtk_dialog_new_with_buttons("Help", GTK_WINDOW(window), GTK_DIALOG_MODAL, NULL);
-    gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
-
-    vbox = gtk_vbox_new(0,0);
-
-    image = gtk_image_new_from_stock(GTK_STOCK_INFO, GTK_ICON_SIZE_DIALOG);
-    gtk_box_pack_start(GTK_BOX(vbox), image, 0, 0, 0);
-
-    label = gtk_label_new("BOBS' Simulator");
-    gtk_box_pack_start(GTK_BOX(vbox), label, 0, 0, 0);
-
-    GtkWidget* sep = gtk_separator_menu_item_new();
-    gtk_box_pack_start(GTK_BOX(vbox), sep, 0, 0, 0);
-
-    label = gtk_label_new("\nHere comes help items for easy running of the simulator.\n");
-    gtk_box_pack_start(GTK_BOX(vbox), label, 0, 0, 0);
-    
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox, 0, 0, 0);
-
-    gtk_widget_show_all(dialog);
-    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
+    displayConverted();
+    char * message = "Mnemonics converted to opcode.";
+    displayErrorMessage(message, start_of_code+PC);
 }
 
 void aboutDialog(GtkWidget* button, gpointer window){

@@ -6,7 +6,7 @@
 
 #define MAX_TOK_LEN 20 //MAX TOKEN LENGHT
 #define MAX_LABEL_LEN 20
-#define MAX_OP_LEN 0x1000
+
 
 
 typedef enum {
@@ -34,8 +34,6 @@ char* start;
 
 //opcode position
 int Op_count;
-Memory Op[MAX_OP_LEN];
-
 
 //define functions used
 int to_opcode();                                        //Covert to opcode

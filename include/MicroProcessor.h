@@ -6,16 +6,30 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "Stack.h"
+#include "ppi.h"
 
+
+
+#define MAX_OP_LEN 0x1000
 //start of the code
 #define start_of_code 0x8000
 
-void ThrowError(char*,int);
-int my_itoa(int val, char* buf);
+void ThrowError(char*,int);     //Throw error
+
+//For both RunOpcode and SingleStep to work one must call the main function of Microprocessor.c
+// i.e both opcode must be generated and Opcode_init should be called
+void RunOpcode();               //Run all opcodes
+void SingleStep();              //Run single step
+
+
+int hasHalted;
+
 
 int flag;
-int Port[4];
-int baseADD;
+
+PPI pPort; ///ppi ports, pPort.pa.val
+PPI mPort; ///microprocessor ports mPort.pa.val
+
 int A,B,C,D,E,H,L,M,PC,PSW,IR;
 
 typedef struct{
@@ -23,6 +37,7 @@ typedef struct{
     int value;
 }Memory;
 
+Memory Op[MAX_OP_LEN];
 
 int getzero();
 int getcarry();

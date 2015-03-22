@@ -1,25 +1,16 @@
 #include "Opcode.h"
 
-void Opcode_main(Memory* Op, int pCounter){
-    PC = pCounter - start_of_code;  //this will be the current pos of our opcode
-    opcode = Op;
+void Opcode_init(int pCounter){
+    PC = pCounter - start_of_code;  //this will be the current pos of our Op
     hasHalted = 0;
-    Evaluate(PC);
-    printflags();
 }
 
 void printflags(){
-    printf("A: %X\n B: %X\n C: %X\n D: %X\n E: %X\n H: %X\n L: %X\n M: %X\n ",A,B,C,D,E,H,L,M);
+    printf("\n");
+    printf("\n A: %X\n B: %X\n C: %X\n D: %X\n E: %X\n H: %X\n L: %X\n M: %X\n ",A,B,C,D,E,H,L,M);
     printf("S %d, CY %d, Z %d, AC %d, P %d ", getsign(),getcarry(),getzero(),getAF(),getparity());
 }
-void Evaluate(int pCounter){
-    while(1){
-        Eval_Opcode(opcode[PC].value);
-        if (hasHalted)
-                return;
-        PC ++;
-    }
-}
+
 void updateFlags(int regA, int op1, int op2,int mode){
     if (regA == 0x00) setzero();
     else resetzero();
@@ -50,13 +41,28 @@ void updateFlags(int regA, int op1, int op2,int mode){
 
 }
 
-void Eval_Opcode(int value){
+void Eval_Stepwise(){
     int op1,op2,res;
+    int value;
+    int jmpvalue = 0;
+
+    value = Op[PC].value;
+
+    if (pPort.strA){
+        jmpvalue = 0x8fB3;
+        goto call;
+    }
+
+    if (pPort.strB){
+        jmpvalue = 0x8fB9;
+        goto call;
+    }
+
     if (value == 0xCE){
         /// ACI DATA
         int prevCarry = getcarry();
         op1 = A;
-        op2 = opcode[++PC].value;
+        op2 = Op[++PC].value;
         res = op1 + op2 + prevCarry;
         updateFlags(res,op1,op2,0);
         A = res & 0xFF;
@@ -217,7 +223,7 @@ void Eval_Opcode(int value){
     else if (value == 0xC6){
         ///ADI DATA
         op1 = A;
-        op2 = opcode[++PC].value;
+        op2 = Op[++PC].value;
         res = op1 + op2;
         updateFlags(res,op1,op2,0);
         A = res & 0xFF;
@@ -313,7 +319,7 @@ void Eval_Opcode(int value){
     else if (value == 0xE6){
         ///ANI DATA
         op1 = A;
-        op2 = opcode[++PC].value;
+        op2 = Op[++PC].value;
         res = op1 & op2;
         updateFlags(res,op1,op2,0);
         resetcarry();
@@ -323,126 +329,147 @@ void Eval_Opcode(int value){
 
     else if (value == 0xCD){
         ///CALL LABEL
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+
+        call:
+        if (jmpvalue){
+            push(PC);
+            PC = jmpvalue - start_of_code;
+            jmpvalue = 0;
+        }
+        return;
     }
 
     else if (value == 0xDC){
         ///CC LABEL
         //if carry flag is 0
-        if (getcarry() == 0)
+        if (getcarry() == 0){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xFC){
         ///CM LABEL
         //if not a minus sign
-        if (getsign() == 0)
+        if (getsign() == 0){
+            PC += 3;
             return;
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        }
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xD4){
         ///CNC LABEL
         //if carry return
-        if (getcarry() == 1)
+        if (getcarry() == 1){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xC4){
         ///CNZ LABEL
         //if zero return
-        if (getzero() == 1)
+        if (getzero() == 1){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xFC){
         ///CP LABEL
         //if not positive return
-        if (getsign() == 1)
+        if (getsign() == 1){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xEC){
         ///CPE LABEL
         //if not parity return
-        if (getparity() == 0)
+        if (getparity() == 0){
+            PC += 3;
             return;
+        }
 
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xE4){
         ///CPO LABEL
         //if parity return
-        if (getparity() == 1)
+        if (getparity() == 1){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xCC){
         ///CZ LABEL
         //if not zero return
-        if (getzero() == 0)
+        if (getzero() == 0){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
 
@@ -533,7 +560,7 @@ void Eval_Opcode(int value){
     else if (value == 0xFE){
         ///CPI DATA
         op1 = A;
-        op2 = opcode[++PC].value;
+        op2 = Op[++PC].value;
         if (op1 > op2) setcarry();
         else if (op1 == op2) setzero();
         else{resetcarry(); resetzero();}
@@ -605,41 +632,49 @@ void Eval_Opcode(int value){
     else if (value == 0x3D){
         ///DCR A
         A -= 1;
+        updateFlags(A,0,0,0);
     }
 
     else if (value == 0x05){
         ///DCR B
         B -= 1;
+        updateFlags(B,0,0,0);
     }
 
     else if (value == 0x0D){
         ///DCR C
         C -= 1;
+        updateFlags(C,0,0,0);
     }
 
     else if (value == 0x15){
         ///DCR D
         D -= 1;
+        updateFlags(D,0,0,0);
     }
 
     else if (value == 0x1D){
         ///DCR E
         E -= 1;
+        updateFlags(E,0,0,0);
     }
 
     else if (value == 0x25){
         ///DCR H
         H -= 1;
+        updateFlags(H,0,0,0);
     }
 
     else if (value == 0x2D){
         ///DCR L
         L -= 1;
+        updateFlags(L,0,0,0);
     }
 
     else if (value == 0x35){
         ///DCR M
         M -= 1;
+        updateFlags(H,0,0,0);
     }
 
     else if (value == 0x0B){
@@ -673,48 +708,63 @@ void Eval_Opcode(int value){
 
     else if (value == 0xDB){
         ///IN port-address
-        op1 = opcode[++PC].value - baseADD;
-        A = Port[op1];
+        op1 = Op[++PC].value;
+
+        if (op1 >= pPort.baseaddr && op1 <= pPort.baseaddr+3){
+            A = Read(op1,&pPort);
+        }
+
+        else if (op1 >= mPort.baseaddr && op1 <= mPort.baseaddr+3){
+            A = Read(op1,&mPort);
+        }
     }
 
     else if (value == 0x3C){
         ///INR A
         A += 1;
+        updateFlags(A,0,0,0);
     }
 
     else if (value == 0x04){
         ///INR B
         B += 1;
+        updateFlags(B,0,0,0);
     }
 
     else if (value == 0x0C){
         ///INR C
         C += 1;
+        updateFlags(C,0,0,0);
     }
 
     else if (value == 0x14){
         ///INR D
         D += 1;
+        updateFlags(D,0,0,0);
     }
 
     else if (value == 0x1C){
         ///INR E
         E += 1;
+        updateFlags(E,0,0,0);
     }
 
     else if (value == 0x24){
         ///INR H
         H += 1;
+        updateFlags(H,0,0,0);
     }
 
     else if (value == 0x2C){
         ///INR L
         L += 1;
+        updateFlags(L,0,0,0);
     }
 
     else if (value == 0x34){
         ///INR M
         M += 1;
+        updateFlags(M,0,0,0);
     }
 
     else if (value == 0x03){
@@ -748,116 +798,126 @@ void Eval_Opcode(int value){
 
     else if (value == 0xDA){
         ///JC Label
-        if (getcarry() == 0)
+        if (getcarry() == 0){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xDA){
         ///JM Label
-        if (getsign() == 0)
+        if (getsign() == 0){
+            PC += 3;
             return;
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        }
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xC3){
         ///JMP Label
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xD2){
         ///JNC Label
-        if (getcarry() == 1)
+        if (getcarry() == 1){
+            PC += 3;
             return;
+        }
 
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xC2){
         ///JNZ Label
-        if (getzero() == 1)
+        if (getzero() == 1){
+            PC += 3;
             return;
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        }
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xf2){
         ///JP Label
-        if (getsign() == 1)
+        if (getsign() == 1){
+            PC += 3;
             return;
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        }
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xEA){
         ///JPE Label
-        if (getparity() == 0)
+        if (getparity() == 0){
+            PC += 3;
             return;
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        }
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xE2){
         ///JPO Label
-        if (getparity() == 1)
+        if (getparity() == 1){
+            PC += 3;
             return;
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        }
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xCA){
         ///JZ Label
-        if (getzero() == 0)
+        if (getzero() == 0){
+            PC += 3;
             return;
-
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        }
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         PC = (up << 8) + lo - start_of_code;
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0x3A){
         ///LDA Address
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         res = (up << 8) + lo - start_of_code;
-        A = opcode[res].value;
+        A = Op[res].value;
     }
 
     else if (value == 0x0A){
@@ -866,7 +926,7 @@ void Eval_Opcode(int value){
         int up = B;
 
         res = (up << 8) + lo - start_of_code;
-        A = opcode[res].value;
+        A = Op[res].value;
     }
 
     else if (value == 0x1A){
@@ -875,22 +935,22 @@ void Eval_Opcode(int value){
         int up = D;
 
         res = (up << 8) + lo - start_of_code;
-        A = opcode[res].value;
+        A = Op[res].value;
     }
 
     else if (value == 0x2A){
         ///LHLD Address
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         res = (up << 8) + lo - start_of_code;
-        L = opcode[res].value;
-        H = opcode[res+1].value;
+        L = Op[res].value;
+        H = Op[res+1].value;
     }
 
     else if (value == 0x01){
         ///LXI B
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         B = up;
         C = lo;
@@ -898,8 +958,8 @@ void Eval_Opcode(int value){
 
     else if (value == 0x11){
         ///LXI D
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         D = up;
         E = lo;
@@ -907,8 +967,8 @@ void Eval_Opcode(int value){
 
     else if (value == 0x21){
         ///LXI H
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         H = up;
         L = lo;
@@ -916,8 +976,8 @@ void Eval_Opcode(int value){
 
     else if (value == 0x31){
         ///LXI SP
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         res = (up << 8) + lo;
         SP = res - start_of_code;
     }
@@ -1125,35 +1185,35 @@ void Eval_Opcode(int value){
 
     else if (value == 0x3E){
         ///MVI A, DATA
-        A = opcode[++PC].value;
+        A = Op[++PC].value;
     }
     else if (value == 0x06){
         ///MVI B, DATA
-        B = opcode[++PC].value;
+        B = Op[++PC].value;
     }
     else if (value == 0x0E){
         ///MVI C, DATA
-        C = opcode[++PC].value;
+        C = Op[++PC].value;
     }
     else if (value == 0x16){
         ///MVI D, DATA
-        D = opcode[++PC].value;
+        D = Op[++PC].value;
     }
     else if (value == 0x1E){
         ///MVI E, DATA
-        E = opcode[++PC].value;
+        E = Op[++PC].value;
     }
     else if (value == 0x26){
         ///MVI H, DATA
-        H = opcode[++PC].value;
+        H = Op[++PC].value;
     }
     else if (value == 0x2E){
         ///MVI L, DATA
-        L = opcode[++PC].value;
+        L = Op[++PC].value;
     }
     else if (value == 0x36){
         ///MVI M, DATA
-        M = opcode[++PC].value;
+        M = Op[++PC].value;
     }
 
     else if(value == 0x00){
@@ -1226,7 +1286,7 @@ void Eval_Opcode(int value){
 
     else if (value == 0xF6){
         ///ORI DATA
-        A = A | opcode[++PC].value;
+        A = A | Op[++PC].value;
         updateFlags(A,0,0,0);
         resetAF();
         resetcarry();
@@ -1234,8 +1294,16 @@ void Eval_Opcode(int value){
 
     else if (value == 0xD3){
         ///OUT port-address
-        op1 = opcode[++PC].value - baseADD;
-        Port[op1] = A;
+        op1 = Op[++PC].value;
+
+        if (op1 >= pPort.baseaddr && op1 <= pPort.baseaddr+3){
+            Write(op1,A,&pPort);
+        }
+
+        else if (op1 >= mPort.baseaddr && op1 <= mPort.baseaddr+3){
+            Write(op1,A,&mPort);
+        }
+
     }
 
     else if (value == 0xE9){
@@ -1324,62 +1392,62 @@ void Eval_Opcode(int value){
         ///RC
         if (getcarry() == 0) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xC9){
         ///RET
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xF8){
         ///RM
         if (getsign() == 0) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xD0){
         ///RNC
         if (getcarry() == 1) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xC0){
         ///RNZ
         if (getzero() == 1) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
      else if (value == 0xC8){
         ///RZ
         if (getzero() == 0) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xF0){
         ///RP
         if (getsign() == 1) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xE8){
         ///RPE
         if (getparity() == 0) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0xE0){
         ///RP0
         if (getparity() == 1) return;
         PC = pop();
-        Evaluate(PC);
+        return;
     }
 
     else if (value == 0x76){
@@ -1475,7 +1543,7 @@ void Eval_Opcode(int value){
     else if (value == 0xDE){
         ///SBI DATA
         op1 = A;
-        op2 = -(opcode[++PC].value);
+        op2 = -(Op[++PC].value);
         res = op1 + op2;
         updateFlags(res,op1,op2,1);
         A = res & 0xff;
@@ -1555,11 +1623,11 @@ void Eval_Opcode(int value){
 
     else if (value == 0x22){
         ///SHLD Address
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
         res = (up << 8) + lo - start_of_code;
-        opcode[res].value = L;
-        opcode[res+1].value = H;
+        Op[res].value = L;
+        Op[res+1].value = H;
     }
 
     else if (value == 0xf9){
@@ -1571,11 +1639,11 @@ void Eval_Opcode(int value){
 
     else if (value == 0x32){
         ///STA
-        int lo = opcode[++PC].value;
-        int up = opcode[++PC].value;
+        int lo = Op[++PC].value;
+        int up = Op[++PC].value;
 
         res = (up << 8) + lo - start_of_code;
-        opcode[res].value = A;
+        Op[res].value = A;
     }
 
     else if (value == 0x02){
@@ -1584,7 +1652,7 @@ void Eval_Opcode(int value){
         int up = B;
 
         res = (up << 8) + lo - start_of_code;
-        opcode[res].value = A;
+        Op[res].value = A;
     }
 
     else if (value == 0x12){
@@ -1593,7 +1661,7 @@ void Eval_Opcode(int value){
         int up = D;
 
         res = (up << 8) + lo - start_of_code;
-        opcode[res].value = A;
+        Op[res].value = A;
     }
 
     else if (value == 0x37){
@@ -1678,7 +1746,7 @@ void Eval_Opcode(int value){
 
     else if (value == 0xEE){
         ///XRI DATA
-        op1 = opcode[++PC].value;
+        op1 = Op[++PC].value;
         A = A ^ op1;
         updateFlags(A,0,0,0);
         resetAF();
@@ -1696,5 +1764,7 @@ void Eval_Opcode(int value){
         push(op2);
         push(op1);
     }
+
+    PC++;
 
 }

@@ -52,11 +52,19 @@ void displayRegister(){
 	}
 }
 void displayIOPort(){
-	int outputValue[] = {Port[0], Port[1], Port[2]};
+	int outputValue[] = {mPort.pa.val, mPort.pb.val, mPort.pc.val};
 	int i; char binaryOutputValue[8];
 	for (i = 0; i < 3; i++){
 		toBinary(outputValue[i], binaryOutputValue);
 		gtk_entry_set_text(GTK_ENTRY(ioPortEntry[i]), binaryOutputValue);
+	}
+}
+void displayPPIPort(){
+	int outputValue[] = {pPort.pa.val, pPort.pb.val, pPort.pc.val};
+	int i; char binaryOutputValue[8];
+	for (i = 0; i < 3; i++){
+		toBinary(outputValue[i], binaryOutputValue);
+		gtk_entry_set_text(GTK_ENTRY(ppiEntry[i]), binaryOutputValue);
 	}
 }
 
@@ -68,16 +76,52 @@ char* getCodedText(){
 	text = gtk_text_buffer_get_text (buffer, &start, &end, FALSE);
 	return text;
 }
+void refresh(){
+    displayFlag();
+    displayRegister();
+    displayIOPort();
+    displayPPIPort();
 
-void displayConverted(char* mnemonics, char* opcode){
+	char memoryValue[4];
+    int memoryValueInt = Op[0].value;
+    sprintf(memoryValue, "%X", memoryValueInt);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
+}
+
+void displayConverted(){
+    const size_t total_size = 300;
+    const size_t line_size = 30;
+
+    char* mnemonics = malloc(total_size);
+    char* opcode = malloc(total_size);
+    char* cline = malloc(line_size);
+    
+    strcpy(mnemonics, " ");
+    strcpy(opcode, " ");
+ 
+    FILE* mfile = fopen("bin/Instruction.txt","r");
+    FILE* ofile = fopen("bin/Opcode.txt","r");
+
+    if (!(ofile) || (!mfile)){
+        printf("File could not be located");
+        return;
+    }
+
+    while (fgets(cline, line_size, mfile) != NULL){
+        strcat(mnemonics,cline);
+        strcat(mnemonics," ");
+    }
+    while (fgets(cline, line_size, ofile) != NULL){
+        strcat(opcode,cline);
+        strcat(opcode," ");
+    }
+
     GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaYourCode));
     gtk_text_buffer_set_text(buffer, mnemonics, strlen(mnemonics));
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
     gtk_text_buffer_set_text(buffer, opcode, strlen(opcode));
     gtk_notebook_next_page (GTK_NOTEBOOK(notebook));
-    displayFlag();
-    displayRegister();
-    displayIOPort();
+    refresh();
 }
 
 void displayErrorMessage(char* message, int pos){
@@ -152,18 +196,13 @@ void nextMemory(GtkWidget* button, gpointer data){
 void menuResponse(GtkWidget *menuItems, gpointer data){
 	const char* items = gtk_menu_item_get_label(GTK_MENU_ITEM(menuItems));
 
-	// if ( strcmp ( items, "New" ) == 0 )		{		newFile(menuItems, data);		}
-	// if ( strcmp ( items, "Open" ) == 0 )	{		openFile(menuItems, data);		}
-	if ( strcmp ( items, "Save" ) == 0 )	{		saveFile(menuItems, data);		}
-	if ( strcmp ( items, "Quit" ) == 0 )	{		gtk_main_quit();				}
-	if ( strcmp ( items, "Build" ) == 0 )	{		buildMenu(menuItems, data);		}
-	if ( strcmp ( items, "Run" ) == 0 )		{		runMenu(menuItems, data);		}
-	if ( strcmp ( items, "Help" ) == 0 )	{		helpDialog(menuItems, data);	}
-	if ( strcmp ( items, "About" ) == 0 )	{		aboutDialog(menuItems, data);	}
-	if ( strcmp ( items, "Convert" ) == 0 )	{		convertMenu(menuItems, data);	}
-	if ( strcmp ( items, "Preferences" ) == 0 )		{		preferencesMenu(menuItems, data);	}
-	if ( strcmp ( items, " Single Step" ) == 0 )	{		singleStepMenu(menuItems, data);	}
-	if ( strcmp ( items, "Instructions" ) == 0 )	{		instructionDialog(menuItems, data);	}
+	if ( strcmp ( items, "Save"			) == 0 )	{	saveFile(menuItems, data);			}
+	if ( strcmp ( items, "Quit"			) == 0 )	{	gtk_main_quit();					}
+	if ( strcmp ( items, "Build"		) == 0 )	{	buildMenu(menuItems, data);			}
+	if ( strcmp ( items, "Run"			) == 0 )	{	runMenu(menuItems, data);			}
+	if ( strcmp ( items, "About"		) == 0 )	{	aboutDialog(menuItems, data);		}
+	if ( strcmp ( items, "Convert"		) == 0 )	{	convertMenu(menuItems, data);		}
+	if ( strcmp ( items, "Single Step" ) == 0 )	{	singleStepMenu(menuItems, data);	}
 }
 
 GtkWidget* drawMenuItems(GtkWidget* window){
@@ -249,30 +288,19 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	icon = gtk_image_new_from_icon_name("gtk-save", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Save", "Save", "Private", icon, G_CALLBACK(saveFile), NULL);
 	
-	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
-
-	icon = gtk_image_new_from_icon_name("gtk-yes", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name("gtk-media-record", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Build", "Build", "Private", icon, G_CALLBACK(buildMenu), NULL);
-	icon = gtk_image_new_from_icon_name("gtk-media-play", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name("gtk-yes", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Run", "Run", "Private", icon, G_CALLBACK(runMenu), NULL);
-	icon = gtk_image_new_from_icon_name("gtk-goto-last", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name("gtk-media-pause", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "SS", "Single Step", "Private", icon, G_CALLBACK(singleStepMenu), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-convert", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Convert", "Convert Code", "Private", icon, G_CALLBACK(convertMenu), NULL);
 	
 	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 
-	icon = gtk_image_new_from_icon_name(GTK_STOCK_INFO, GTK_ICON_SIZE_BUTTON);
-	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Ins", "Instructions", "Private", icon, G_CALLBACK(instructionDialog), NULL);
-	icon = gtk_image_new_from_icon_name("gtk-help", GTK_ICON_SIZE_BUTTON);
-	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Help", "Help", "Private", icon, G_CALLBACK(helpDialog), NULL);
-	icon = gtk_image_new_from_icon_name("gtk-about", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name("gtk-info", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "About", "About", "Private", icon, G_CALLBACK(aboutDialog), NULL);
-	
-	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
-
-	icon = gtk_image_new_from_icon_name("gtk-preferences", GTK_ICON_SIZE_BUTTON);
-	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Setting", "Setting", "Private", icon, G_CALLBACK(preferencesMenu), NULL);
 	
 	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 
@@ -293,9 +321,8 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	vbox = gtk_vbox_new(0, 0);
 	font_desc = pango_font_description_from_string ("Serif 15");
 
-	gchar* regNames[] = {"A", "BC", "DE", "HL", "PC", "SP"};
-
 // registers
+	gchar* regNames[] = {"A", "BC", "DE", "HL", "PC", "SP"};
 	table = gtk_table_new(6, 4, 0);
 	for (i = 0; i < 9; i++){
 		registerEntry[i] = gtk_entry_new();
@@ -365,6 +392,41 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
     frame = gtk_frame_new(" O/P Ports\t");
 	gtk_container_add(GTK_CONTAINER(frame), table);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
+	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
+	
+// vertical separator line
+	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
+
+// codearea
+	vbox = gtk_vbox_new(0, 0);
+	hbox = gtk_hbox_new(0, 0);
+	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
+	gtk_box_pack_start(GTK_BOX(micro), notebook, 0, 0, 5);
+
+	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
+	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(textAreaYourCode), 2);
+	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(textAreaYourCode), 2);
+    gtk_widget_set_size_request(scrolledWindow, 400,300);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaYourCode), 15);
+	gtk_widget_modify_font (textAreaYourCode, font_desc);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaYourCode);
+	label = gtk_label_new ("YourCode");
+	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
+
+	scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
+    gtk_widget_set_size_request(scrolledWindow, 400,300);
+	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(textAreaConvertedCode), 2);
+	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(textAreaConvertedCode), 2);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaConvertedCode), 15);
+	gtk_widget_modify_font (textAreaConvertedCode, font_desc);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaConvertedCode);
+	label = gtk_label_new ("ConvertedCode");
+	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
+
+// vertical separator line
+	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
 
 // memory access
 	hbox = gtk_hbox_new(0, 0);
@@ -402,82 +464,8 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	frame = gtk_frame_new(" Memory\t");
 	gtk_container_add(GTK_CONTAINER(frame), memVbox);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 1);
-	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
-	
-// vertical separator line
-	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
 
-// codearea
-	vbox = gtk_vbox_new(0, 0);
-	hbox = gtk_hbox_new(0, 0);
-	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-	gtk_box_pack_start(GTK_BOX(micro), notebook, 0, 0, 5);
-
-	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
-	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(textAreaYourCode), 2);
-	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(textAreaYourCode), 2);
-    gtk_widget_set_size_request(scrolledWindow, 400,300);
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaYourCode), 15);
-	gtk_widget_modify_font (textAreaYourCode, font_desc);
-    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaYourCode);
-	label = gtk_label_new ("YourCode");
-	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
-
-	scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
-    gtk_widget_set_size_request(scrolledWindow, 400,300);
-	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(textAreaConvertedCode), 2);
-	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(textAreaConvertedCode), 2);
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaConvertedCode), 15);
-	gtk_widget_modify_font (textAreaConvertedCode, font_desc);
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
-    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
-    gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaConvertedCode);
-	label = gtk_label_new ("ConvertedCode");
-	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
-
-// vertical separator line
-	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
-
-//timer
-	GtkWidget *timerVBox = gtk_vbox_new(0, 0);
-	hbox = gtk_hbox_new(0, 0);
-	for (i = 0; i < 4; i++){
-		timerEntry[i] = gtk_entry_new();
-		gtk_editable_set_editable(GTK_EDITABLE(timerEntry[i]), FALSE);
-		gtk_entry_set_max_length(GTK_ENTRY(timerEntry[i]), 2);
-		gtk_widget_modify_font (timerEntry[i], font_desc);
-		gtk_widget_set_size_request(timerEntry[i], 50, 35);
-		gtk_box_pack_start(GTK_BOX(hbox), timerEntry[i], 1, 1, 1);
-	}
-	gtk_box_pack_start(GTK_BOX(timerVBox), hbox, 1, 1, 5);
-
-	/*
-	icon = gtk_image_new_from_icon_name("gtk-media-record", GTK_ICON_SIZE_BUTTON);
-	button = gtk_button_new_from_stock(NULL);
-	gtk_button_set_image(GTK_BUTTON(button), icon);
-	*/
-	hbox = gtk_hbox_new(0, 0);
-	button = gtk_button_new_with_label(" Start ");
-	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStart), NULL);
-	button = gtk_button_new_with_label(" Pause ");
-	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerPause), NULL);
-	button = gtk_button_new_with_label(" Stop ");
-	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStop), NULL);
-	button = gtk_button_new_with_label(" Reset ");
-	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerReset), NULL);
-	gtk_box_pack_start(GTK_BOX(timerVBox), hbox, 0, 0, 1);
-
-	timerReset();
-
-	frame = gtk_frame_new(" Timer\t");
-	gtk_container_add(GTK_CONTAINER(frame), timerVBox);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
-
-//PPI
+// //PPI
 	GtkWidget* ppiVBox = gtk_vbox_new(0, 0);
 	char* ppiName[] = {"Port A :-", "Port B :-", "Port C :-"};
 	for (i = 0; i < 3; i++){
@@ -506,7 +494,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 
 	frame = gtk_frame_new(" 8255 PPI\t");
 	gtk_container_add(GTK_CONTAINER(frame), ppiVBox);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 10);
 
 
 	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);

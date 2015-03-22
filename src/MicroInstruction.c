@@ -58,7 +58,7 @@ void get_token(){
 }
 
 void Increase_O_pos(char* instruction){
-    int i;
+
     if (strstr(" ADC ADD ANA CMA CMC CMP DAA DAD DCR DCX DI EI HLT INR INX LDAX MOV NOP ORA PCHL POP PUSH RAL RAR RC RET RIM RLC RM RNC RNZ RP RPE RPO RRC RST SBB SIM SPHL STAX STC SUB XCHG XRA XYHL", instruction)) Op_count += 1;
     if (strstr(" ACI ADI ANI CPI IN MVI ORI OUT SBI SUI XRI ", instruction)) Op_count += 2;
     if (strstr(" CALL CC CM CNC CNZ CP CPE CPO CZ JC JM JMP JNC JNZ JP JPE JPO JZ LDA LHLD LXI SHLD STA ",instruction)) Op_count += 3;
@@ -1169,8 +1169,6 @@ void micro_main(char* instructions, FILE* outfile){
     To_Start();
     //convert the code to opcode
     to_opcode();
-
-    Opcode_main(&Op,start_of_code);
 
     print(&Op,Op_count,outfile);
     free(Label_list);

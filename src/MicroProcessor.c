@@ -22,7 +22,18 @@ int microMain(){
         strcat(tline,cline);
         strcat(tline," ");
     }
+
+    //convert into opcode and opcodes are in Opcode
     micro_main(tline,ofile);
+
+    //Initialize the opcodes
+    Opcode_init(start_of_code);
+
+    // //Run all opcodes
+    // RunOpcode();
+
+    // printflags();
+
     free(tline);
     free(cline);
 
@@ -31,9 +42,24 @@ int microMain(){
     return 0;
 }
 
+void RunOpcode(){
+    //run it stepwise till we have found a hasHalt signal
+    while(!hasHalted){
+        Eval_Stepwise();
+    }
+}
+
+void SingleStep(){
+    if (hasHalted){
+        char * message = "Execution completed.";
+        displayErrorMessage(message, start_of_code+PC);
+        return;
+    }
+    Eval_Stepwise();
+}
+
 //Throw error
 void ThrowError(char* message, int pos){
-   printf("%s at pos %d\n",message,pos);
    displayErrorMessage(message, start_of_code+pos);
 }
 
@@ -58,12 +84,9 @@ void initialize(){
 //initialize stack
     init_stack();
 
-//Base address
-    baseADD = 0x40;
-    Port[0] = 100;
-    Port[1] = 0;
-    Port[2] = 0;
-    Port[3] = 0;
+//Port initialization
+    PPIinit(&pPort,0x80);
+    PPIinit(&mPort,0x40);
 
 }
 
