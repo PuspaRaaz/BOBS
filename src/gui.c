@@ -1,7 +1,7 @@
 #include "gui.h"
 
-void stroneOne(){	mPort.strA = 1;	}
-void strobeTwo(){	mPort.strB = 1;	}
+void stroneOne(){	pPort.strA = 1;	}
+void strobeTwo(){	pPort.strB = 1;	}
 
 void toBinary(int value, char* output)
 {
@@ -73,10 +73,10 @@ void displayConverted(){
     char* mnemonics = malloc(total_size);
     char* opcode = malloc(total_size);
     char* cline = malloc(line_size);
-    
+
     strcpy(mnemonics, " ");
     strcpy(opcode, " ");
- 
+
     FILE* mfile = fopen("bin/Instruction.txt","r");
     FILE* ofile = fopen("bin/Opcode.txt","r");
 
@@ -132,7 +132,7 @@ void previousMemory(GtkWidget* button, gpointer data){
 }
 void setMemory(GtkWidget* button, gpointer data){
 	char memoryAddress[4], memoryValue[4];
-	
+
 	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
 	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
 
@@ -169,7 +169,7 @@ void nextMemory(GtkWidget* button, gpointer data){
     gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
     gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
 }
-    
+
 
 void menuResponse(GtkWidget *menuItems, gpointer data){
 	const char* items = gtk_menu_item_get_label(GTK_MENU_ITEM(menuItems));
@@ -265,7 +265,7 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	// gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Open", "Open", "Private", icon, G_CALLBACK(openFile), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-save", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Save", "Save", "Private", icon, G_CALLBACK(saveFile), NULL);
-	
+
 	icon = gtk_image_new_from_icon_name("gtk-media-record", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Build", "Build", "Private", icon, G_CALLBACK(buildMenu), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-yes", GTK_ICON_SIZE_BUTTON);
@@ -274,17 +274,17 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "SS", "Single Step", "Private", icon, G_CALLBACK(singleStepMenu), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-convert", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Convert", "Convert Code", "Private", icon, G_CALLBACK(convertMenu), NULL);
-	
+
 	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 
 	icon = gtk_image_new_from_icon_name("gtk-info", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "About", "About", "Private", icon, G_CALLBACK(aboutDialog), NULL);
-	
+
 	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 
 	icon = gtk_image_new_from_icon_name("gtk-close", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Quit", "Quit", "Private", icon, G_CALLBACK(gtk_main_quit), NULL);
-	
+
 	hbox = gtk_hbox_new(0,0);
 	gtk_box_pack_start(GTK_BOX(hbox), toolbar, 0,0,0);
 
@@ -371,7 +371,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_container_add(GTK_CONTAINER(frame), table);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
 	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
-	
+
 // vertical separator line
 	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
 

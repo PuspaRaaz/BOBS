@@ -3,6 +3,7 @@
 void Opcode_init(int pCounter){
     PC = pCounter - start_of_code;  //this will be the current pos of our Op
     hasHalted = 0;
+
 }
 
 void printflags(){
@@ -36,9 +37,12 @@ void updateFlags(int regA, int op1, int op2,int mode){
         if (nib > 0xF) setAF();
         else resetAF();
     }
+}
 
-
-
+void interrupt(int jmpvalue){
+    push(PC);
+    PC = jmpvalue - start_of_code;
+    return;
 }
 
 void Eval_Stepwise(){
@@ -46,17 +50,20 @@ void Eval_Stepwise(){
     int value;
     int jmpvalue = 0;
 
-    value = Op[PC].value;
-
     if (pPort.strA){
         jmpvalue = 0x8fB3;
-        goto call;
+        interrupt(jmpvalue);
+        printf("%d \n",Op[PC].value);
+        pPort.strA = 0;
     }
 
     if (pPort.strB){
         jmpvalue = 0x8fB9;
-        goto call;
+        interrupt(jmpvalue);
+        pPort.strB = 0;
     }
+
+    value = Op[PC].value;
 
     if (value == 0xCE){
         /// ACI DATA
@@ -334,13 +341,6 @@ void Eval_Stepwise(){
         push(PC+1);
 
         PC = (up << 8) + lo - start_of_code;
-
-        call:
-        if (jmpvalue){
-            push(PC);
-            PC = jmpvalue - start_of_code;
-            jmpvalue = 0;
-        }
         return;
     }
 

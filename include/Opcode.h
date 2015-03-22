@@ -12,5 +12,6 @@ void Opcode_init(int pCounter);
 void Eval_Stepwise();
 void updateFlags(int regA, int op1, int op2,int mode); //mode = 0 for addition, 1 for subtraction
 void printflags();
+void interrupt(int jmpvalue);
 //Opcode lists
 #endif
