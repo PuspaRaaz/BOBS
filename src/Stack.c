@@ -6,9 +6,9 @@ void init_stack(){
 
 void push(int v){
     SP--;
-    value[SP] = v;
+    value[SP-start_of_code] = v;
 }
 
 int pop(){
-    return value[SP++];
+    return value[SP++ - start_of_code];
 }
