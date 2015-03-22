@@ -13,7 +13,6 @@
 
 #define STARTOFCODE 0x8000
 
-GtkWidget *timerEntry[4];
 GtkWidget *flagEntry[5], *registerEntry[9], *ioPortEntry[3], *ppiEntry[3];
 GtkWidget *textAreaYourCode, *textAreaConvertedCode, *errorArea, *notebook, *memLocation, *memValue;
 PangoFontDescription* font_desc;
@@ -32,10 +31,9 @@ void menuResponse(GtkWidget*, gpointer);
 void nextMemory(GtkWidget*, gpointer);
 void previousMemory(GtkWidget*, gpointer);
 void setMemory(GtkWidget*, gpointer);
-void timerPause();
-void timerReset();
-void timerStart();
-void timerStop();
+void strobeOne();
+void strobeTwo();
+void strobeThree();
 void toBinary(int, char*);
 
 #endif

@@ -1,29 +1,7 @@
 #include "gui.h"
 
-void timerStart(){
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ST");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "AR");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "TE");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "D.");
-}
-void timerPause(){
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "PA");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "US");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "ED");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "..");
-}
-void timerStop(){
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ST");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "OP");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "PE");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "D.");
-}
-void timerReset(){
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "00");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "00");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "00");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "00");
-}
+void stroneOne(){	mPort.strA = 1;	}
+void strobeTwo(){	mPort.strB = 1;	}
 
 void toBinary(int value, char* output)
 {
@@ -196,12 +174,12 @@ void nextMemory(GtkWidget* button, gpointer data){
 void menuResponse(GtkWidget *menuItems, gpointer data){
 	const char* items = gtk_menu_item_get_label(GTK_MENU_ITEM(menuItems));
 
-	if ( strcmp ( items, "Save"			) == 0 )	{	saveFile(menuItems, data);			}
-	if ( strcmp ( items, "Quit"			) == 0 )	{	gtk_main_quit();					}
-	if ( strcmp ( items, "Build"		) == 0 )	{	buildMenu(menuItems, data);			}
-	if ( strcmp ( items, "Run"			) == 0 )	{	runMenu(menuItems, data);			}
-	if ( strcmp ( items, "About"		) == 0 )	{	aboutDialog(menuItems, data);		}
-	if ( strcmp ( items, "Convert"		) == 0 )	{	convertMenu(menuItems, data);		}
+	if ( strcmp ( items, "Save"		) == 0 )	{	saveFile(menuItems, data);			}
+	if ( strcmp ( items, "Quit"		) == 0 )	{	gtk_main_quit();					}
+	if ( strcmp ( items, "Build"	) == 0 )	{	buildMenu(menuItems, data);			}
+	if ( strcmp ( items, "Run"		) == 0 )	{	runMenu(menuItems, data);			}
+	if ( strcmp ( items, "About"	) == 0 )	{	aboutDialog(menuItems, data);		}
+	if ( strcmp ( items, "Convert"	) == 0 )	{	convertMenu(menuItems, data);		}
 	if ( strcmp ( items, "Single Step" ) == 0 )	{	singleStepMenu(menuItems, data);	}
 }
 
@@ -215,14 +193,14 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 
 	const gchar* menuName[] = {"_File", "E_xecute", "_Help"};
 
-	const gchar* fileMenuItemNames[] = {"New", "Open", "Save", "Preferences", "Quit"};
-	const guint fileMenuAccelGroup[] = {GDK_n, GDK_o, GDK_s, GDK_p, GDK_q};
+	const gchar* fileMenuItemNames[] = {"New", "Open", "Save", "Quit"};
+	const guint fileMenuAccelGroup[] = {GDK_n, GDK_o, GDK_s, GDK_q};
 
 	const gchar* executeMenuItemNames[] = {"Build", "Run", "Single Step", "Convert"};
 	const guint executeMenuAccelGroup[] = {GDK_F5, GDK_F9, GDK_F10, GDK_F11};
 
-	const gchar* helpMenuItemNames[] = {"Instructions", "Help", "About"};
-	const guint helpMenuAccelGroup[] = {GDK_F3, GDK_F1, GDK_F12};
+	const gchar* helpMenuItemNames[] = {"Help", "About"};
+	const guint helpMenuAccelGroup[] = {GDK_F1, GDK_F12};
 
 	vbox = gtk_vbox_new(0, 0);
 	menuBar = gtk_menu_bar_new();
@@ -482,14 +460,10 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	hbox = gtk_hbox_new(0, 0);
 	button = gtk_button_new_with_label(" Strobe 1 ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStart), NULL);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(stroneOne), NULL);
 	button = gtk_button_new_with_label(" Strobe 2 ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerPause), NULL);
-	button = gtk_button_new_with_label(" Strobe 3 ");
-	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStop), NULL);
-	button = gtk_button_new_with_label(" Reset ");
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(strobeTwo), NULL);
 	gtk_box_pack_start(GTK_BOX(ppiVBox), hbox, 0, 0, 3);
 
 	frame = gtk_frame_new(" 8255 PPI\t");
