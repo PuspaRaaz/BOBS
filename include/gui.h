@@ -14,7 +14,7 @@
 #define STARTOFCODE 0x8000
 
 GtkWidget *timerEntry[4];
-GtkWidget *flagEntry[5], *registerEntry[9], *ioPortEntry[3];
+GtkWidget *flagEntry[5], *registerEntry[9], *ioPortEntry[3], *ppiEntry[3];
 GtkWidget *textAreaYourCode, *textAreaConvertedCode, *errorArea, *notebook, *memLocation, *memValue;
 PangoFontDescription* font_desc;
 
@@ -24,11 +24,18 @@ GtkWidget* getError(GtkWidget*);
 GtkWidget* getMicroprocessor(GtkWidget*);
 char* getCodedText();
 void displayConverted(char*, char*);
+void displayErrorMessage(char*, int);
+void displayFlag();
+void displayIOPort();
+void displayRegister();
 void menuResponse(GtkWidget*, gpointer);
-void timerStart();
+void nextMemory(GtkWidget*, gpointer);
+void previousMemory(GtkWidget*, gpointer);
+void setMemory(GtkWidget*, gpointer);
 void timerPause();
-void timerStop();
 void timerReset();
+void timerStart();
+void timerStop();
 void toBinary(int, char*);
 
 #endif

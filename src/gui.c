@@ -1,22 +1,22 @@
 #include "gui.h"
 
 void timerStart(){
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ti");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "me");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "r.");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "..");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ST");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "AR");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "TE");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "D.");
 }
 void timerPause(){
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ti");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "me");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "r.");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "PA");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "US");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "ED");
 	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "..");
 }
 void timerStop(){
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ti");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "me");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "r.");
-	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "..");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "ST");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[1]), "OP");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[2]), "PE");
+	gtk_entry_set_text(GTK_ENTRY(timerEntry[3]), "D.");
 }
 void timerReset(){
 	gtk_entry_set_text(GTK_ENTRY(timerEntry[0]), "00");
@@ -439,7 +439,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_box_pack_start(GTK_BOX(micro), gtk_vseparator_new(), 0, 0, 0);
 
 //timer
-	GtkWidget *rightVBox = gtk_vbox_new(0, 0);
+	GtkWidget *timerVBox = gtk_vbox_new(0, 0);
 	hbox = gtk_hbox_new(0, 0);
 	for (i = 0; i < 4; i++){
 		timerEntry[i] = gtk_entry_new();
@@ -449,8 +449,13 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 		gtk_widget_set_size_request(timerEntry[i], 50, 35);
 		gtk_box_pack_start(GTK_BOX(hbox), timerEntry[i], 1, 1, 1);
 	}
-	gtk_box_pack_start(GTK_BOX(rightVBox), hbox, 1, 1, 5);
+	gtk_box_pack_start(GTK_BOX(timerVBox), hbox, 1, 1, 5);
 
+	/*
+	icon = gtk_image_new_from_icon_name("gtk-media-record", GTK_ICON_SIZE_BUTTON);
+	button = gtk_button_new_from_stock(NULL);
+	gtk_button_set_image(GTK_BUTTON(button), icon);
+	*/
 	hbox = gtk_hbox_new(0, 0);
 	button = gtk_button_new_with_label(" Start ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
@@ -464,13 +469,47 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	button = gtk_button_new_with_label(" Reset ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
 	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerReset), NULL);
-	gtk_box_pack_start(GTK_BOX(rightVBox), hbox, 0, 0, 1);
+	gtk_box_pack_start(GTK_BOX(timerVBox), hbox, 0, 0, 1);
+
+	timerReset();
 
 	frame = gtk_frame_new(" Timer\t");
-	gtk_container_add(GTK_CONTAINER(frame), rightVBox);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 1);
-	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
+	gtk_container_add(GTK_CONTAINER(frame), timerVBox);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
 
+//PPI
+	GtkWidget* ppiVBox = gtk_vbox_new(0, 0);
+	char* ppiName[] = {"Port A :-", "Port B :-", "Port C :-"};
+	for (i = 0; i < 3; i++){
+		ppiEntry[i] = gtk_entry_new();
+		hbox = gtk_hbox_new(0, 0);
+		gtk_widget_modify_font (ppiEntry[i], font_desc);
+		gtk_entry_set_max_length(GTK_ENTRY(ppiEntry[i]), 8);
+		gtk_widget_set_size_request(ppiEntry[i], 40, 35);
+		label = gtk_label_new(ppiName[i]);
+		gtk_box_pack_start(GTK_BOX(hbox), label, 0, 0, 10);
+		gtk_box_pack_start(GTK_BOX(hbox), ppiEntry[i], 1, 1, 2);
+		gtk_box_pack_start(GTK_BOX(ppiVBox), hbox, 0, 0, 3);
+	}
+	hbox = gtk_hbox_new(0, 0);
+	button = gtk_button_new_with_label(" Strobe 1 ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStart), NULL);
+	button = gtk_button_new_with_label(" Strobe 2 ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerPause), NULL);
+	button = gtk_button_new_with_label(" Strobe 3 ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(timerStop), NULL);
+	button = gtk_button_new_with_label(" Reset ");
+	gtk_box_pack_start(GTK_BOX(ppiVBox), hbox, 0, 0, 3);
+
+	frame = gtk_frame_new(" 8255 PPI\t");
+	gtk_container_add(GTK_CONTAINER(frame), ppiVBox);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, 0, 0, 5);
+
+
+	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
 	pango_font_description_free (font_desc);
 	return micro;
 }
