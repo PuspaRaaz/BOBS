@@ -11,14 +11,17 @@
 #include <string.h>
 
 int built;
-PangoFontDescription* font_desc;
-void newFile(GtkWidget*, gpointer);
-void openFile(GtkWidget*, gpointer);
-void saveFile(GtkWidget*, gpointer);
-void buildMenu(GtkWidget*, gpointer);
-void runMenu(GtkWidget*, gpointer);
-void singleStepMenu(GtkWidget*, gpointer);
-void convertMenu(GtkWidget*, gpointer);
-void aboutDialog(GtkWidget*, gpointer);
+
+void aboutDialog(GtkWidget*, gpointer);		//draws ABOUT dialog box
+void buildMenu(GtkWidget*, gpointer);		//builds the source code
+void convertMenu(GtkWidget*, gpointer);		//converts the mnemonics into opcode
+void getOpcode(GtkWidget*, gpointer);		//generates an opcode file for user
+void helpDialog(GtkWidget*, gpointer);		//draws HELP dialog box
+void newFile();			//creates new file
+void openFile(GtkWidget*, gpointer);		//opens OPEN dialog box
+void runMenu(GtkWidget*, gpointer);			//runs the program
+void saveAsFile(GtkWidget*, gpointer);		//opens SAVE AS dialog box
+void saveFile(GtkWidget*, gpointer);		//saves the changes
+void singleStepMenu(GtkWidget*, gpointer);	//runs the program stepwise
 
 #endif

@@ -76,7 +76,7 @@ void Write(int addr, int val, PPI *mppi)
             else if(mppi->pc.io == 2) //pc lower is in output mode
             {
                 mppi->pc.val = val & 0x0f;
-                printf("%d", mppi->pc.val);
+                // printf("%d", mppi->pc.val);
                 break;
             }
             else if(mppi->pc.io == 0) //both in output mode
@@ -104,7 +104,7 @@ int Read(int addr, PPI *mppi)
         switch(cur_addr)
     {
     case 0:
-        printf("%d", mppi->pa.io);
+        // printf("%d", mppi->pa.io);
         if(mppi->pa.io)
         {
             temp = mppi->pa.val;
@@ -135,7 +135,7 @@ int Read(int addr, PPI *mppi)
 }
 void PPIportShow(PPI *mppi)
 {
-    printf("Port A: %d\n", mppi->pa.val);
-    printf("Port B: %d\n", mppi->pb.val);
-    printf("Port C: %d\n", mppi->pc.val);
+    // printf("Port A: %d\n", mppi->pa.val);
+    // printf("Port B: %d\n", mppi->pb.val);
+    // printf("Port C: %d\n", mppi->pc.val);
 }

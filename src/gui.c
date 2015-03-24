@@ -1,15 +1,42 @@
 #include "gui.h"
 
-void stroneOne(){	pPort.strA = 1;	}
-void strobeTwo(){	pPort.strB = 1;	}
+char* getCodedText(){
+    GtkTextIter start, end;
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(textAreaYourCode));
+	gchar *text;
+	gtk_text_buffer_get_bounds (buffer, &start, &end);
+	text = gtk_text_buffer_get_text (buffer, &start, &end, FALSE);
+	return text;
+}
 
-void toBinary(int value, char* output)
-{
-    int i;
-    output[8] = '\0';
-    for (i = 7; i >= 0; --i, value >>= 1){
-        output[i] = (value & 1) + '0';
+int nofile(){
+    if(!sourceFile.saved && sourceFile.filename == NULL){
+        displayErrorMessage("No file selected.", 0);
+    	return TRUE;
     }
+    return FALSE;
+}
+
+void clearConvertedCode(){
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(textAreaConvertedCode));
+	gtk_text_buffer_set_text(buffer, "", 0);
+}
+
+void displayConverted(){
+	if (nofile()) return;
+	displaySource(sourceFile.filename);
+	displayOutput();
+    gtk_notebook_next_page (GTK_NOTEBOOK(notebook));
+    refresh();
+    displayErrorMessage("Mnemonics converted to opcode.", start_of_code+PC);
+}
+
+void displayErrorMessage(char* message, int pos){
+	char position[200];
+	sprintf(position, "%X :\t", pos);
+	strcat(position, message);
+	GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(errorArea));
+    gtk_text_buffer_set_text(buffer, position, -1);
 }
 void displayFlag(){
 	int flag[] = {getsign(), getzero(), getAF(), getparity(), getcarry()};
@@ -18,6 +45,44 @@ void displayFlag(){
 		char value[2];
 		sprintf(value, "%d", flag[i]);
 		gtk_entry_set_text(GTK_ENTRY(flagEntry[i]), value);
+	}
+}
+void displayIOPort(){
+	int outputValue[] = {mPort.pa.val, mPort.pb.val, mPort.pc.val};
+	int i; char binaryOutputValue[8];
+	for (i = 0; i < 3; i++){
+		toBinary(outputValue[i], binaryOutputValue);
+		gtk_entry_set_text(GTK_ENTRY(ioPortEntry[i]), binaryOutputValue);
+	}
+}
+void displayOutput(){
+    const size_t total_size = 0x1000;
+    const size_t line_size = 0x50;
+    char* opcode = malloc(total_size);
+    char* cline = malloc(line_size);
+    strcpy(opcode, " ");
+    FILE* ofile = fopen(OUTPUTFILENAME,"r");
+    if (!ofile){
+        displayErrorMessage("File could not be located", 0);
+        return;
+    }
+    while (fgets(cline, line_size, ofile) != NULL){
+        strcat(opcode,cline);
+        strcat(opcode," ");
+    }
+
+    GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
+    gtk_text_buffer_set_text(buffer, opcode, -1);
+    fclose(ofile);
+    free(opcode);
+    free(cline);
+}
+void displayPPIPort(){
+	int outputValue[] = {pPort.pa.val, pPort.pb.val, pPort.pc.val};
+	int i; char binaryOutputValue[8];
+	for (i = 0; i < 3; i++){
+		toBinary(outputValue[i], binaryOutputValue);
+		gtk_entry_set_text(GTK_ENTRY(ppiEntry[i]), binaryOutputValue);
 	}
 }
 void displayRegister(){
@@ -29,128 +94,40 @@ void displayRegister(){
 		gtk_entry_set_text(GTK_ENTRY(registerEntry[i]), value);
 	}
 }
-void displayIOPort(){
-	int outputValue[] = {mPort.pa.val, mPort.pb.val, mPort.pc.val};
-	int i; char binaryOutputValue[8];
-	for (i = 0; i < 3; i++){
-		toBinary(outputValue[i], binaryOutputValue);
-		gtk_entry_set_text(GTK_ENTRY(ioPortEntry[i]), binaryOutputValue);
+void displaySource(char* filename){
+	if(nofile()){
+	    GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaYourCode));
+	    gtk_text_buffer_set_text(buffer, "", 0);
+	    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
+	    gtk_text_buffer_set_text(buffer, "", 0);
+	    gtk_notebook_prev_page (GTK_NOTEBOOK(notebook));
+	    return;
 	}
-}
-void displayPPIPort(){
-	int outputValue[] = {pPort.pa.val, pPort.pb.val, pPort.pc.val};
-	int i; char binaryOutputValue[8];
-	for (i = 0; i < 3; i++){
-		toBinary(outputValue[i], binaryOutputValue);
-		gtk_entry_set_text(GTK_ENTRY(ppiEntry[i]), binaryOutputValue);
-	}
-}
-
-char* getCodedText(){
-    GtkTextIter start, end;
-	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(textAreaYourCode));
-	gchar *text;
-	gtk_text_buffer_get_bounds (buffer, &start, &end);
-	text = gtk_text_buffer_get_text (buffer, &start, &end, FALSE);
-	return text;
-}
-void refresh(){
-    displayFlag();
-    displayRegister();
-    displayIOPort();
-    displayPPIPort();
-
-	char memoryValue[4];
-    int memoryValueInt = Op[0].value;
-    sprintf(memoryValue, "%X", memoryValueInt);
-    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
-}
-
-void displayConverted(){
-    const size_t total_size = 300;
-    const size_t line_size = 30;
-
+    const size_t total_size = 0x1000;
+    const size_t line_size = 0x50;
     char* mnemonics = malloc(total_size);
-    char* opcode = malloc(total_size);
     char* cline = malloc(line_size);
-
     strcpy(mnemonics, " ");
-    strcpy(opcode, " ");
+    FILE* mfile = fopen(filename,"r");
 
-    FILE* mfile = fopen("bin/Instruction.txt","r");
-    FILE* ofile = fopen("bin/Opcode.txt","r");
-
-    if (!(ofile) || (!mfile)){
-        printf("File could not be located");
+    if (!mfile){
+        displayErrorMessage("File could not be located", 0);
         return;
     }
-
     while (fgets(cline, line_size, mfile) != NULL){
         strcat(mnemonics,cline);
         strcat(mnemonics," ");
     }
-    while (fgets(cline, line_size, ofile) != NULL){
-        strcat(opcode,cline);
-        strcat(opcode," ");
-    }
 
     GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaYourCode));
-    gtk_text_buffer_set_text(buffer, mnemonics, strlen(mnemonics));
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textAreaConvertedCode));
-    gtk_text_buffer_set_text(buffer, opcode, strlen(opcode));
-    gtk_notebook_next_page (GTK_NOTEBOOK(notebook));
-    refresh();
+    gtk_text_buffer_set_text(buffer, mnemonics, -1);
+    fclose(mfile);
+    free(mnemonics);
+    free(cline);
 }
-
-void displayErrorMessage(char* message, int pos){
-	char position[200];
-	sprintf(position, "%X :\t", pos);
-	strcat(position, message);
-	GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(errorArea));
-    gtk_text_buffer_set_text(buffer, position, strlen(position));
-}
-
-void previousMemory(GtkWidget* button, gpointer data){
-	int memAddress, memoryValueInt = 100;
-	char memoryValue[5], memoryAddress[4];
-
-	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
-	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
-
-    memAddress = (int) strtol(memoryAddressConst, NULL, 16);
-
-    if (memAddress > 0x8000 && memAddress < STARTOFCODE+MAX_OP_LEN) memAddress--;
-    else memAddress = STARTOFCODE;
-
-    memoryValueInt = Op[memAddress - STARTOFCODE].value;
-
-    sprintf(memoryAddress, "%X", memAddress);
-    sprintf(memoryValue, "%X", memoryValueInt);
-
-    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
-    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
-}
-void setMemory(GtkWidget* button, gpointer data){
-	char memoryAddress[4], memoryValue[4];
-
-	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
-	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
-
-	buffer = gtk_entry_get_buffer (GTK_ENTRY(memValue));
-	const char* memoryValueConst = gtk_entry_buffer_get_text (buffer);
-
-    int memAddressInt = (int) strtol(memoryAddressConst, NULL, 16);
-    int memValueInt = (int) strtol(memoryValueConst, NULL, 16);
-    sprintf(memoryAddress, "%X", memAddressInt);
-    sprintf(memoryValue, "%X", memValueInt);
-
-    Op[memAddressInt - STARTOFCODE].value = memValueInt;
-
-    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
-    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
-}
-void nextMemory(GtkWidget* button, gpointer data){
-	int memAddress, memoryValueInt = 100;
+void nextMemory(){
+	setMemory();
+	int memAddress, memoryValueInt;
 	char memoryValue[5], memoryAddress[4];
 
 	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
@@ -169,17 +146,100 @@ void nextMemory(GtkWidget* button, gpointer data){
     gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
     gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
 }
+void previousMemory(){
+	int memAddress, memoryValueInt;
+	char memoryValue[5], memoryAddress[4];
 
+	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
+	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
 
+    memAddress = (int) strtol(memoryAddressConst, NULL, 16);
+
+    if (memAddress > 0x8000 && memAddress < STARTOFCODE+MAX_OP_LEN) memAddress--;
+    else memAddress = STARTOFCODE;
+
+    memoryValueInt = Op[memAddress - STARTOFCODE].value;
+
+    sprintf(memoryAddress, "%X", memAddress);
+    sprintf(memoryValue, "%X", memoryValueInt);
+
+    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
+}
+void refresh(){
+    displayFlag();
+    displayRegister();
+    displayIOPort();
+    displayPPIPort();
+
+	char memoryValue[4];
+    int memoryValueInt = Op[0].value;
+    sprintf(memoryValue, "%X", memoryValueInt);
+    gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
+}
+void setMemory(){
+	char memoryAddress[4], memoryValue[4];
+
+	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
+	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
+
+	buffer = gtk_entry_get_buffer (GTK_ENTRY(memValue));
+	const char* memoryValueConst = gtk_entry_buffer_get_text (buffer);
+
+    int memAddressInt = (int) strtol(memoryAddressConst, NULL, 16);
+    int memValueInt = (int) strtol(memoryValueConst, NULL, 16);
+    sprintf(memoryAddress, "%X", memAddressInt);
+    sprintf(memoryValue, "%X", memValueInt);
+
+    Op[memAddressInt - STARTOFCODE].value = memValueInt;
+
+    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
+}
+void stroneOne(){	pPort.strA = 1;	}
+void strobeTwo(){	pPort.strB = 1;	}
+void toBinary(int value, char* output)
+{
+    int i;
+    output[8] = '\0';
+    for (i = 7; i >= 0; --i, value >>= 1){
+        output[i] = (value & 1) + '0';
+    }
+}
+void viewMemory(){
+	int memAddress, memoryValueInt;
+	char memoryValue[5], memoryAddress[4];
+
+	GtkEntryBuffer *buffer = gtk_entry_get_buffer (GTK_ENTRY(memLocation));
+	const char* memoryAddressConst = gtk_entry_buffer_get_text (buffer);
+
+    memAddress = (int) strtol(memoryAddressConst, NULL, 16);
+
+    if (memAddress < 0x8000 && memAddress >= STARTOFCODE+MAX_OP_LEN) memAddress = STARTOFCODE;
+
+    memoryValueInt = Op[memAddress - STARTOFCODE].value;
+
+    sprintf(memoryAddress, "%X", memAddress);
+    sprintf(memoryValue, "%X", memoryValueInt);
+
+    gtk_entry_set_text (GTK_ENTRY (memLocation), memoryAddress);
+    gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
+}
 void menuResponse(GtkWidget *menuItems, gpointer data){
 	const char* items = gtk_menu_item_get_label(GTK_MENU_ITEM(menuItems));
 
-	if ( strcmp ( items, "Save"		) == 0 )	{	saveFile(menuItems, data);			}
-	if ( strcmp ( items, "Quit"		) == 0 )	{	gtk_main_quit();					}
-	if ( strcmp ( items, "Build"	) == 0 )	{	buildMenu(menuItems, data);			}
-	if ( strcmp ( items, "Run"		) == 0 )	{	runMenu(menuItems, data);			}
 	if ( strcmp ( items, "About"	) == 0 )	{	aboutDialog(menuItems, data);		}
+	if ( strcmp ( items, "Build"	) == 0 )	{	buildMenu(menuItems, data);			}
 	if ( strcmp ( items, "Convert"	) == 0 )	{	convertMenu(menuItems, data);		}
+	if ( strcmp ( items, "Get Opcode") == 0)	{	getOpcode(menuItems, data);			}
+	if ( strcmp ( items, "Help"		) == 0 )	{	helpDialog(menuItems, data);		}
+	if ( strcmp ( items, "New"		) == 0 )	{	newFile(menuItems, data);			}
+	if ( strcmp ( items, "Open"		) == 0 )	{	openFile(menuItems, data);			}
+	if ( strcmp ( items, "Quit"		) == 0 )	{	gtk_main_quit();					}
+	if ( strcmp ( items, "Run"		) == 0 )	{	runMenu(menuItems, data);			}
+	if ( strcmp ( items, "Save As"	) == 0 )	{	saveAsFile(menuItems, data);		}
+	if ( strcmp ( items, "Save"		) == 0 )	{	saveFile(menuItems, data);			}
 	if ( strcmp ( items, "Single Step" ) == 0 )	{	singleStepMenu(menuItems, data);	}
 }
 
@@ -193,8 +253,8 @@ GtkWidget* drawMenuItems(GtkWidget* window){
 
 	const gchar* menuName[] = {"_File", "E_xecute", "_Help"};
 
-	const gchar* fileMenuItemNames[] = {"New", "Open", "Save", "Quit"};
-	const guint fileMenuAccelGroup[] = {GDK_n, GDK_o, GDK_s, GDK_q};
+	const gchar* fileMenuItemNames[] = {"New", "Open", "Save", "Save As", "Get Opcode", "Quit"};
+	const guint fileMenuAccelGroup[] = {GDK_n, GDK_o, GDK_s, GDK_d, GDK_g, GDK_q};
 
 	const gchar* executeMenuItemNames[] = {"Build", "Run", "Single Step", "Convert"};
 	const guint executeMenuAccelGroup[] = {GDK_F5, GDK_F9, GDK_F10, GDK_F11};
@@ -259,12 +319,16 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	gtk_container_set_border_width(GTK_CONTAINER(toolbar), 5);
     gtk_toolbar_set_style(GTK_TOOLBAR ( toolbar ), GTK_TOOLBAR_ICONS);
 
-	// icon = gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_BUTTON);
-	// gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "New", "New", "Private", icon, G_CALLBACK(newFile), NULL);
-	// icon = gtk_image_new_from_icon_name("gtk-open", GTK_ICON_SIZE_BUTTON);
-	// gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Open", "Open", "Private", icon, G_CALLBACK(openFile), NULL);
+	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+
+	icon = gtk_image_new_from_icon_name("gtk-add", GTK_ICON_SIZE_BUTTON);
+	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "New", "New", "Private", icon, G_CALLBACK(newFile), NULL);
+	icon = gtk_image_new_from_icon_name("gtk-open", GTK_ICON_SIZE_BUTTON);
+	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Open", "Open", "Private", icon, G_CALLBACK(openFile), NULL);
 	icon = gtk_image_new_from_icon_name("gtk-save", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Save", "Save", "Private", icon, G_CALLBACK(saveFile), NULL);
+
+	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 
 	icon = gtk_image_new_from_icon_name("gtk-media-record", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Build", "Build", "Private", icon, G_CALLBACK(buildMenu), NULL);
@@ -278,6 +342,8 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
 
 	icon = gtk_image_new_from_icon_name("gtk-info", GTK_ICON_SIZE_BUTTON);
+	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Help", "Help", "Private", icon, G_CALLBACK(helpDialog), NULL);
+	icon = gtk_image_new_from_icon_name("gtk-about", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "About", "About", "Private", icon, G_CALLBACK(aboutDialog), NULL);
 
 	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
@@ -285,10 +351,28 @@ GtkWidget* drawToolbar(GtkWidget* window){
 	icon = gtk_image_new_from_icon_name("gtk-close", GTK_ICON_SIZE_BUTTON);
 	gtk_toolbar_append_item(GTK_TOOLBAR(toolbar), "Quit", "Quit", "Private", icon, G_CALLBACK(gtk_main_quit), NULL);
 
+	gtk_toolbar_append_space(GTK_TOOLBAR(toolbar));
+
 	hbox = gtk_hbox_new(0,0);
 	gtk_box_pack_start(GTK_BOX(hbox), toolbar, 0,0,0);
 
 	return hbox;
+}
+
+GtkWidget* getError(GtkWidget* window){
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(errorArea), FALSE);
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(errorArea), FALSE);
+
+    GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request(scrolledWindow, 250, 70);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(errorArea), 15);
+    gtk_container_add(GTK_CONTAINER(scrolledWindow), errorArea);
+	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(errorArea), 2);
+	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(errorArea), 2);
+    GtkWidget* frame = gtk_frame_new(" Message\t");
+    gtk_container_add(GTK_CONTAINER(frame), scrolledWindow);
+
+    return frame;
 }
 
 GtkWidget* getMicroprocessor(GtkWidget* window){
@@ -314,11 +398,11 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 		gtk_table_attach(GTK_TABLE(table), label, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
 		for (j = 0; j < 2; j++){
 			if (i != 1 && i != 2 && i !=3){
-				gtk_table_attach(GTK_TABLE(table), registerEntry[pos], 2, 4, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+				gtk_table_attach(GTK_TABLE(table), registerEntry[pos], 2, 4, i, i+1, GTK_FILL, GTK_FILL, 2, 2);
 				pos++;
 				j++;
 			}else{
-				gtk_table_attach(GTK_TABLE(table), registerEntry[pos], j+2, j+3, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+				gtk_table_attach(GTK_TABLE(table), registerEntry[pos], j+2, j+3, i, i+1, GTK_FILL, GTK_FILL, 2, 2);
 				pos++;
 			}
 		}
@@ -341,7 +425,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 		label = gtk_label_new(flagNames[i]);
 		gtk_table_attach(GTK_TABLE(table), label, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
 
-		gtk_table_attach(GTK_TABLE(table), flagEntry[i], 1, 2, i, i+1, GTK_FILL, GTK_FILL, 5, 5);
+		gtk_table_attach(GTK_TABLE(table), flagEntry[i], 1, 2, i, i+1, GTK_FILL, GTK_FILL, 2, 2);
 	}
     displayFlag();
 	frame = gtk_frame_new(" Flags\t");
@@ -363,7 +447,6 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 		sprintf(port, "%c :-", 'A' + i);
 		label = gtk_label_new(port);
 		gtk_table_attach(GTK_TABLE(table), label, 0, 1, i, i+1, GTK_FILL, GTK_FILL, 7, 7);
-
 		gtk_table_attach(GTK_TABLE(table), ioPortEntry[i], 1, 2, i, i+1, GTK_FILL, GTK_FILL, 7, 7);
 	}
     displayIOPort();
@@ -384,15 +467,14 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
 	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(textAreaYourCode), 2);
 	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(textAreaYourCode), 2);
-    gtk_widget_set_size_request(scrolledWindow, 400,300);
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaYourCode), 15);
+    gtk_widget_set_size_request(scrolledWindow, 400,500);
 	gtk_widget_modify_font (textAreaYourCode, font_desc);
     gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaYourCode);
-	label = gtk_label_new ("YourCode");
+	label = gtk_label_new ("Mnemonics");
 	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
 
 	scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
-    gtk_widget_set_size_request(scrolledWindow, 400,300);
+    gtk_widget_set_size_request(scrolledWindow, 400,500);
 	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(textAreaConvertedCode), 2);
 	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(textAreaConvertedCode), 2);
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(textAreaConvertedCode), 15);
@@ -400,7 +482,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
     gtk_text_view_set_editable(GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
     gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(textAreaConvertedCode), FALSE);
     gtk_container_add(GTK_CONTAINER(scrolledWindow), textAreaConvertedCode);
-	label = gtk_label_new ("ConvertedCode");
+	label = gtk_label_new ("Opcode");
 	gtk_notebook_append_page (GTK_NOTEBOOK (notebook), scrolledWindow, label);
 
 // vertical separator line
@@ -413,8 +495,8 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	gtk_widget_modify_font (memLocation, font_desc);
     gtk_entry_set_text (GTK_ENTRY (memLocation), "8000");
 	gtk_entry_set_max_length(GTK_ENTRY(memLocation), 4);
-	gtk_widget_set_size_request(memLocation, 120, 40);
-	gtk_box_pack_start(GTK_BOX(hbox), memLocation, 0, 0, 5);
+	gtk_widget_set_size_request(memLocation, 65, 40);
+	gtk_box_pack_start(GTK_BOX(hbox), memLocation, 1, 1, 5);
 
 	memValue = gtk_entry_new();
 	gtk_widget_modify_font (memValue, font_desc);
@@ -423,17 +505,17 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
     sprintf(memoryValue, "%X", memoryValueInt);
     gtk_entry_set_text (GTK_ENTRY (memValue), memoryValue);
 	gtk_entry_set_max_length(GTK_ENTRY(memValue), 2);
-	gtk_widget_set_size_request(memValue, 60, 40);
-	gtk_box_pack_start(GTK_BOX(hbox), memValue, 0, 0, 5);
+	gtk_widget_set_size_request(memValue, 40, 40);
+	gtk_box_pack_start(GTK_BOX(hbox), memValue, 1, 1, 5);
+	GtkWidget* button = gtk_button_new_with_label(" Go ");
+	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
+	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(viewMemory), NULL);
 	gtk_box_pack_start(GTK_BOX(memVbox), hbox, 1, 1, 1);
 
 	hbox = gtk_hbox_new(0, 0);
-	GtkWidget* button = gtk_button_new_with_label(" << Prev ");
+	button = gtk_button_new_with_label(" << Prev ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
 	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(previousMemory), NULL);
-	button = gtk_button_new_with_label(" Set ");
-	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(setMemory), NULL);
 	button = gtk_button_new_with_label(" Next >> ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
 	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(nextMemory), NULL);
@@ -445,7 +527,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 
 // //PPI
 	GtkWidget* ppiVBox = gtk_vbox_new(0, 0);
-	char* ppiName[] = {"Port A :-", "Port B :-", "Port C :-"};
+	char* ppiName[] = {" A :-", " B :-", " C :-"};
 	for (i = 0; i < 3; i++){
 		ppiEntry[i] = gtk_entry_new();
 		hbox = gtk_hbox_new(0, 0);
@@ -456,7 +538,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 		gtk_box_pack_start(GTK_BOX(hbox), label, 0, 0, 10);
 		gtk_box_pack_start(GTK_BOX(hbox), ppiEntry[i], 1, 1, 2);
 		gtk_box_pack_start(GTK_BOX(ppiVBox), hbox, 0, 0, 3);
-	}
+	}/*
 	hbox = gtk_hbox_new(0, 0);
 	button = gtk_button_new_with_label(" Strobe 1 ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
@@ -464,7 +546,7 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 	button = gtk_button_new_with_label(" Strobe 2 ");
 	gtk_box_pack_start(GTK_BOX(hbox), button, 1, 1, 1);
 	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(strobeTwo), NULL);
-	gtk_box_pack_start(GTK_BOX(ppiVBox), hbox, 0, 0, 3);
+	gtk_box_pack_start(GTK_BOX(ppiVBox), hbox, 0, 0, 3);*/
 
 	frame = gtk_frame_new(" 8255 PPI\t");
 	gtk_container_add(GTK_CONTAINER(frame), ppiVBox);
@@ -473,23 +555,10 @@ GtkWidget* getMicroprocessor(GtkWidget* window){
 
 	gtk_box_pack_start(GTK_BOX(micro), vbox, 0, 0, 5);
 	pango_font_description_free (font_desc);
+
+	newFile();
+
 	return micro;
-}
-
-GtkWidget* getError(GtkWidget* window){
-	gtk_text_view_set_editable(GTK_TEXT_VIEW(errorArea), FALSE);
-    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(errorArea), FALSE);
-
-    GtkWidget* scrolledWindow = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_size_request(scrolledWindow, 250, 70);
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(errorArea), 15);
-    gtk_container_add(GTK_CONTAINER(scrolledWindow), errorArea);
-	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(errorArea), 2);
-	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(errorArea), 2);
-    GtkWidget* frame = gtk_frame_new(" Error Message\t");
-    gtk_container_add(GTK_CONTAINER(frame), scrolledWindow);
-
-    return frame;
 }
 
 /*

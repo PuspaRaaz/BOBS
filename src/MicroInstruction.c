@@ -416,6 +416,7 @@ int to_opcode(){
 
         else if (!strcasecmp("HLT",token)){
             Append(0x76);
+            haltFound = 1;
         }
 
         else if (!strcasecmp("IN",token)){
@@ -1175,10 +1176,10 @@ void micro_main(char* instructions, FILE* outfile){
     free(token);
 }
 
-void print(Memory* in , int c,FILE* outfile){
+void print(Memory* in , int c, FILE* outfile){
     int i;
     for( i =0;i<c;i++){
         fprintf(outfile,"%X : ",in[i].addr);
-        fprintf(outfile,"%X \n",in[i].value);
+        fprintf(outfile,"%X\n",in[i].value);
     }
 }

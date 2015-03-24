@@ -18,7 +18,7 @@ int main(int argc, char** argv){
 	container = drawMenuItems(window);
 	gtk_box_pack_start(GTK_BOX(container), drawToolbar(window), 0, 1, 1);
 	gtk_box_pack_start(GTK_BOX(container), gtk_hseparator_new(), 0, 0, 0);
-	gtk_box_pack_start(GTK_BOX(container), getMicroprocessor(window), 0, 0, 1);
+	gtk_box_pack_start(GTK_BOX(container), getMicroprocessor(window), 0, 0, 10);
 	gtk_box_pack_start(GTK_BOX(container), gtk_hseparator_new(), 0, 0, 0);
 	gtk_box_pack_start(GTK_BOX(container), getError(window), 1, 1, 1);
 

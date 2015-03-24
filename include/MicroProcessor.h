@@ -8,11 +8,9 @@
 #include "Stack.h"
 #include "ppi.h"
 
-
-
 #define MAX_OP_LEN 0x1000
-//start of the code
 #define start_of_code 0x8000
+#define OUTPUTFILENAME ".Opcode.txt"
 
 void ThrowError(char*,int);     //Throw error
 
@@ -21,21 +19,26 @@ void ThrowError(char*,int);     //Throw error
 void RunOpcode();               //Run all opcodes
 void SingleStep();              //Run single step
 
-
-int hasHalted;
-
-
-int flag;
+int hasHalted, haltFound;
 
 PPI pPort; ///ppi ports, pPort.pa.val
 PPI mPort; ///microprocessor ports mPort.pa.val
 
+int flag;
 int A,B,C,D,E,H,L,M,PC,PSW,IR;
 
 typedef struct{
     int addr;
     int value;
 }Memory;
+
+typedef struct
+{
+	char* filename;
+	int saved;
+}FileSystem;
+
+FileSystem sourceFile;
 
 Memory Op[MAX_OP_LEN];
 
@@ -57,7 +60,5 @@ void resetparity();
 void setAF();
 void resetAF();
 void complement_carry();
-
-
 
 #endif

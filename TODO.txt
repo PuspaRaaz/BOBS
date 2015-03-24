@@ -1,8 +1,13 @@
 DONE:
-- Save
-- Build
-- Convert
-- Flags
+- File actions (new, save, open, save as)
+- Execute actions (build, run, single step, convert)
+- Help actions (about)
+
+- Register, Flag, Output ports, Memory and PPI ports update/refresh
+- Messages (progress and error)
 
 TODO:
--DID UPTO LDA
+- empty file execution
+- file extension filter
+- Strobe signals (threading)
+- infinite loop (threading)

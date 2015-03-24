@@ -13,27 +13,33 @@
 
 #define STARTOFCODE 0x8000
 
+char* getCodedText();					//returns input text
+int nofile();							//checks if file exists or not
+void displayConverted();				//calls displaySource/Output and refresh
+void displayErrorMessage(char*, int);	//display messages
+void displayFlag();						//display flag values
+void displayIOPort();					//display output ports values
+void displayOutput();					//displays generated opcode
+void displayPPIPort();					//displays PPI port values
+void displayRegister();					//displays register values
+void displaySource(char*);				//display source code from the file
+void nextMemory();						//shows next memory address and its value
+void previousMemory();					//shows next memory address and its value
+void refresh();							//displays updated value of register/ports/flags
+void setMemory();						//sets value to respective memory address
+void strobeOne();						//produces strobe 1 (RST 5.5) signal
+void strobeTwo();						//produces strobe 2 (RST 6.5) signal
+void toBinary(int, char*);				//converts integer value to respective binary
+void viewMemory();						//gives the data at specified memory location
+
 GtkWidget *flagEntry[5], *registerEntry[9], *ioPortEntry[3], *ppiEntry[3];
 GtkWidget *textAreaYourCode, *textAreaConvertedCode, *errorArea, *notebook, *memLocation, *memValue;
 PangoFontDescription* font_desc;
 
-GtkWidget* drawMenuItems(GtkWidget*);
-GtkWidget* drawToolbar(GtkWidget*);
-GtkWidget* getError(GtkWidget*);
-GtkWidget* getMicroprocessor(GtkWidget*);
-char* getCodedText();
-void displayConverted();
-void displayErrorMessage(char*, int);
-void displayFlag();
-void displayIOPort();
-void displayRegister();
-void menuResponse(GtkWidget*, gpointer);
-void nextMemory(GtkWidget*, gpointer);
-void previousMemory(GtkWidget*, gpointer);
-void setMemory(GtkWidget*, gpointer);
-void strobeOne();
-void strobeTwo();
-void strobeThree();
-void toBinary(int, char*);
+GtkWidget* drawMenuItems(GtkWidget*);	//draws the title-bar menus
+GtkWidget* drawToolbar(GtkWidget*);		//draw toolbar menus
+GtkWidget* getError(GtkWidget*);		//gives the message area
+GtkWidget* getMicroprocessor(GtkWidget*);//gives the main microprocessor & ppi components
+void menuResponse(GtkWidget*, gpointer);//receives menu actions/clicks and redirects to respective function
 
 #endif

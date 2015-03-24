@@ -1,5 +1,6 @@
 /bin
 /obj
+.Opcode.txt
 *.swp
 Thumbs.db
 *.cbp

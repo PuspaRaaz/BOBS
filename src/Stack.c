@@ -10,5 +10,7 @@ void push(int v){
 }
 
 int pop(){
-    return value[SP++ - start_of_code];
+	int val = value[SP - start_of_code];
+    SP++;
+    return val;
 }

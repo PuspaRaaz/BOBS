@@ -3,6 +3,11 @@
 void Opcode_init(int pCounter){
     PC = pCounter - start_of_code;  //this will be the current pos of our Op
     hasHalted = 0;
+    int a = 0xfb3;
+
+    Op[a].value = 0xc3;
+    Op[a+1].value = 0x08;
+    Op[a+2].value = 0x80;
 
 }
 
@@ -39,10 +44,9 @@ void updateFlags(int regA, int op1, int op2,int mode){
     }
 }
 
-void interrupt(int jmpvalue){
+void Interrupt(int jmpvalue){
     push(PC);
     PC = jmpvalue - start_of_code;
-    return;
 }
 
 void Eval_Stepwise(){
@@ -52,19 +56,18 @@ void Eval_Stepwise(){
 
     if (pPort.strA){
         jmpvalue = 0x8fB3;
-        interrupt(jmpvalue);
-        printf("%d \n",Op[PC].value);
+        Interrupt(jmpvalue);
         pPort.strA = 0;
     }
 
+
     if (pPort.strB){
         jmpvalue = 0x8fB9;
-        interrupt(jmpvalue);
+        Interrupt(jmpvalue);
         pPort.strB = 0;
     }
 
     value = Op[PC].value;
-
     if (value == 0xCE){
         /// ACI DATA
         int prevCarry = getcarry();
@@ -1311,16 +1314,22 @@ void Eval_Stepwise(){
         PC = (H << 8) + L;
     }
 
-    else if (value == 0xD1){
+    else if (value == 0xC1){
         ///POP B
         C = pop();
         B = pop();
     }
 
-    else if (value == 0xE1){
+    else if (value == 0xD1){
         ///POP D
         E = pop();
         D = pop();
+    }
+
+    else if (value == 0xE1){
+        ///POP H
+        L = pop();
+        H = pop();
     }
 
     else if (value == 0xF1){

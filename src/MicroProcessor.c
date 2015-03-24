@@ -2,19 +2,20 @@
 
 int microMain(){
     initialize();
-    const size_t total_size = 300;
-    const size_t line_size = 30;
+    if(nofile()) return;
+    const size_t total_size = 0x1000;
+    const size_t line_size = 0x50;
 
     char* tline = malloc(total_size);
     char* cline = malloc(line_size);
 
     strcpy(tline, " ");
 
-    FILE* ifile = fopen("bin/Instruction.txt","r");
-    FILE* ofile = fopen("bin/Opcode.txt","w");
+    FILE* ifile = fopen(sourceFile.filename,"r");
+    FILE* ofile = fopen(OUTPUTFILENAME,"w");
 
     if (!(ifile)){
-        printf("File could not be located");
+        displayErrorMessage("File could not be located", 0);
         return -1;
     }
 
@@ -29,11 +30,6 @@ int microMain(){
     //Initialize the opcodes
     Opcode_init(start_of_code);
 
-    // //Run all opcodes
-    // RunOpcode();
-
-    // printflags();
-
     free(tline);
     free(cline);
 
@@ -43,6 +39,7 @@ int microMain(){
 }
 
 void RunOpcode(){
+    if (nofile()) return;
     //run it stepwise till we have found a hasHalt signal
     while(!hasHalted){
         Eval_Stepwise();
@@ -50,17 +47,20 @@ void RunOpcode(){
 }
 
 void SingleStep(){
+    if (nofile()) return;
     if (hasHalted){
         char * message = "Execution completed.";
         displayErrorMessage(message, start_of_code+PC);
         return;
     }
     Eval_Stepwise();
+    refresh();
 }
 
 //Throw error
 void ThrowError(char* message, int pos){
    displayErrorMessage(message, start_of_code+pos);
+   clearConvertedCode();
 }
 
 void initialize(){
@@ -81,13 +81,14 @@ void initialize(){
 //Initialize the flags
     flag = 0;
 
+    haltFound = 0;
+
 //initialize stack
     init_stack();
 
 //Port initialization
     PPIinit(&pPort,0x80);
     PPIinit(&mPort,0x40);
-
 }
 
 int getzero(){
